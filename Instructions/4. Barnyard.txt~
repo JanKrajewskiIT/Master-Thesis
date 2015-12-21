@@ -1,0 +1,41 @@
+1. Na początku nalezy pobrać barnyard z repozytorium
+https://github.com/firnsy/barnyard2/tree/stable
+
+2. Rozpakowujemy barnyard2 i przechodzimy do katalogu barnyard2­-stable, gdzie wywołujemy
+yum install libtool libpcap-devel
+./autogen.sh
+./configure --with-postgresql
+make
+make install
+
+3. Barnyard2 został zainstalowany w katalogu /usr/local/bin. Można przekopiować komendę do /usr/bin 
+aby była widoczna bezpośrednio w konsoli.
+
+cp /usr/local/bin/barnyard2 /usr/bin
+
+4. Do pliku konfiguracyjnego usr/local/etc/barnyard2.conf dodajemy :
+gedit /usr/local/etc/barnyard2.conf
+
+output database: alert, postgresql, host=127.0.0.1 port=5432 user=snort_user password=magisterka dbname=snort_logs sensor_name=snort1
+#output database: log, postgresql, host=localhost port=5432 user=snort_user password=magisterka dbname=snort_logs
+config logdir: /tmp
+config waldo_file: /tmp/waldo
+config process_new_records_only
+
+5. Uruchomienie barnyard2.
+
+Tryb wsadowy
+/usr/local/bin/barnyard2 -c /usr/local/etc/barnyard2.conf -o /var/log/snort/snort.log.1438440068
+
+Tryb daemona
+/usr/local/bin/barnyard2 -v -c /usr/local/etc/barnyard2.conf -d /var/log/snort/ -f merged.log
+
+
+6. cp /usr/local/bin/barnyard2 /etc/init.d/
+chmod +x /etc/init.d/barnyard2
+cp /usr/local/etc/barnyard2.conf /etc/sysconfig/barnyard2
+chkconfig -add barnyard2
+----------------------------------------------------------------------------------------------
+DODATKOWE - NIESPRAWDZONE
+cp /usr/local/bin/barnyard2 /usr/bin
+
