@@ -23,6 +23,10 @@ spo_sguil.c spo_sguil.h \
 spo_echidna.c spo_echidna.h \
 spo_syslog_full.c spo_syslog_full.h \
 spo_database.c spo_database.h \
-spo_database_cache.c spo_database_cache.h
+spo_database_cache.c spo_database_cache.h \
+spo_mgr_firewalld.c spo_mgr_firewalld.h \
+spo_mgr_iptables.c spo_mgr_iptables.h \
+spo_mgr_nftables.c spo_mgr_nftables.h \
+spo_mgr_utils.c spo_mgr_utils.h
 
 AM_CPPFLAGS = -I.. -I ../sfutil

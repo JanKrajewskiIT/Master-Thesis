@@ -2,7 +2,7 @@
 https://github.com/firnsy/barnyard2/tree/stable
 
 2. Rozpakowujemy barnyard2 i przechodzimy do katalogu barnyard2­-stable, gdzie wywołujemy
-yum install libtool libpcap-devel
+yum install libtool libpcap-devel libdnet-devel
 ./autogen.sh
 ./configure --with-postgresql
 make

@@ -75,6 +75,9 @@
 #include "output-plugins/spo_echidna.h"
 #include "output-plugins/spo_sguil.h"
 #include "output-plugins/spo_syslog_full.h"
+#include "output-plugins/spo_mgr_firewalld.h"
+#include "output-plugins/spo_mgr_iptables.h"
+#include "output-plugins/spo_mgr_nftables.h"
 
 extern InputConfigFuncNode  *input_config_funcs;
 extern OutputConfigFuncNode *output_config_funcs;
@@ -333,6 +336,9 @@ void RegisterOutputPlugins(void)
 #endif /* HAVE_LIBPCAP */
 
     DatabaseSetup();
+    MgrFirewalldSetup();
+    MgrIptablesSetup();
+    MgrNftablesSetup();
     AlertFastSetup();
     AlertFullSetup();
     AlertFWsamSetup();
