@@ -1,0 +1,12 @@
+firewall-cmd --get-active-zones
+firewall-cmd --zone=public --add-port=2888/tcp --permanent
+firewall-cmd --reload
+
+nmap -sT -O localhost
+sudo lsof -i
+sudo netstat -lptu
+sudo netstat -tulpn
+
+firewall-cmd --zone=block --list-ports
+
+1. yum install iptables-services

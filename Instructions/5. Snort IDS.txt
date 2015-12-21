@@ -1,0 +1,32 @@
+1. Uruchomienie snorta jako sieciowego IDSa
+snort -c /etc/snort/snort.conf
+snort -A fast -b -d -D -i enp0s3 -u snort -g snort -c /etc/snort/snort.conf -l /var/log/snort
+ps aux|grep snort
+
+2. Konfiguracja snortd
+gedit /etc/sysconfig/snort
+
+INTERFACE=enp0s3
+
+3. Konfiguracja pod barnyard2
+gedit /etc/snort/snort.conf 
+
+output unified2: filename merged.log, limit 128
+
+gedit /etc/sysconfig/snort
+
+# ALERTMODE=fast
+BINARY_LOG=0
+
+4. Odpalenie snort jako demona bez opcji -b i -A
+snort -d -D -i enp0s3 -u snort -g snort -c /etc/snort/snort.conf -l /var/log/snort
+file /var/log/snort/snort.log.1438440068
+u2spewfoo /var/log/snort/snort.log.1438440068 |head
+
+5. instalacja innych narzędzi
+yum install lynx screen
+
+-----------------------------------------------------------------------------------------------------
+INNE 
+
+katalog poleceń - /usr/sbin/

@@ -1,0 +1,63 @@
+1. Najpierw instalujemy postgresql.
+yum install postgresql postgresql-devel postgresql-server postgresql-contrib postgresql-libs postgresql-client
+systemctl enable postgresql
+postgresql-setup initdb
+systemctl status postgresql.service
+systemctl start postgresql
+
+2. Do uzyskania zamierzone działania barnyard2 potrzebne nam będzie wcześniejsze skonfigurowanie środowiska bazy danych.
+sudo su
+su - postgres
+psql
+
+create database snort_logs;
+create user snort_user PASSWORD 'magisterka';
+grant ALL ON DATABASE snort_logs to snort_user;
+systemctl reload postgresql
+
+3. Drugim krokiem jest odpowiednie skonfigurowanie pliku pg_hba.conf
+gedit /var/lib/pgsql/data/pg_hba.conf
+
+# IPv4 local connections:
+#host    all             all             127.0.0.1/32            ident
+host    snort_logs      snort_user   	 127.0.0.1/32    	 password
+
+4. Następnie należy zalogować się do przygotowanej bazy danych stworzonymi kredkami.
+systemctl reload postgresql
+psql -U snort_user -h 127.0.0.1 snort_logs
+
+5. Kolejnym krokiem jest wrzucenie schematu barnyard2
+\i /home/magisterka/Pulpit/Magisterka/pluginy/barnyard2-stable/schemas/create_postgresql
+
+
+
+
+
+------------------------------------------------------------------------------------------------
+DODATKOWE ELEMENTY
+
+usuwanie postgresa
+
+rpm -e postgresql-devel
+rpm -e postgresql
+rpm -e postgresql-server
+rpm -e postgresql-contrib
+rpm -e postgresql-libs
+rpm -e postgresql-client
+
+yum remove postgres\*
+mv /var/lib/pgsql /var/lib/old.pgsql
+
+------------------------------------------------------------------------------------------------
+
+instalacja postgresa 9.5
+http://www.liquidweb.com/kb/how-to-install-and-connect-to-postgresql-on-centos-7/
+sudo su
+rpm -iUvh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-1.noarch.rpm
+yum -y update
+yum -y install postgresql95 postgresql95-server postgresql95-contrib postgresql95-libs --disablerepo=* --enablerepo=pgdg95
+systemctl enable postgresql-9.5
+/usr/pgsql-9.5/bin/postgresql95-setup initdb
+systemctl start postgresql-9.5
+
+gedit /var/lib/pgsql/9.5/data/pg_hba.conf
