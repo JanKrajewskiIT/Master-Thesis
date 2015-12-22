@@ -99,5 +99,41 @@ Snorta w trybie daemona uruchamiamy poprzez :
 snort -d -D -i enp0s3 -u snort -g snort -c /etc/snort/snort.conf -l /var/log/snort
 ```
 
-##Konfiguracja bazy danych dla barnyard2
+## Konfiguracja bazy danych dla barnyard2
 
+Najpierw należy zainstalować postgresql
+```sh
+$ yum install postgresql postgresql-devel postgresql-server postgresql-contrib postgresql-libs postgresql-client
+$ systemctl enable postgresql
+$ postgresql-setup initdb
+$ systemctl status postgresql.service
+$ systemctl start postgresql
+```
+
+Aby móc uruchomić program barnyard2 należy wcześniej skonfigurować środowisko bazy danych
+```sh
+$ sudo su
+$ su - postgres
+$ psql
+
+> create database snort_logs;
+> create user snort_user PASSWORD 'magisterka';
+> grant ALL ON DATABASE snort_logs to snort_user;
+> systemctl reload postgresql
+```
+
+Kolejnym krokiem jest przygotowanie odpowiedniej konfiguracji w pliku pg_hba.conf
+```sh
+#host    all             all             127.0.0.1/32            ident
+host    snort_logs      snort_user   	 127.0.0.1/32    	 password
+```
+
+Na koncu należy zalogować się do przygotowanej bazy danych i wrzucić schemat barnyard2.
+```sh
+$ systemctl reload postgresql
+$ psql -U snort_user -h 127.0.0.1 snort_logs
+
+> \i /home/magisterka/Pulpit/Magisterka/pluginy/barnyard2-stable/schemas/create_postgresql
+```
+
+## Konfiguracja programu barnyard2
