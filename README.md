@@ -27,5 +27,32 @@ $ /media/VBoxLinuxAdditions.run;
 
 W konfiguracji maszyny wirtualnej w VirtualBox'ie w zakładce 'Network' ustawiamy dwa adaptery. Pierwszy 'Host-only Adapter', a drugi 'NAT'. Dzięki tej operacji dostajemy dwa interfejsy sieciowe, a mianowicie : enp0s3 (internetowy) i enp0s8.
 
-# Instalacja i konfiguracja Snort'a
+## Instalacja pierwszej maszyny
+
+Drugą maszynę tworzymy instalując system Kali Linux. Dodajemy narzędzie Guest Addition, a także ustawiamy interfejsy sieciowe, analogicznie jak w przypadku maszyny pierwszej.
+
+## Instalacja i konfiguracja Snort'a
+
+Na wstępie instalujemy pakiety req i snort, które wcześniej należy pobrać z oficjalnej strony www.snort.org. Operację należy wykonać w odpowiedniej kolejności
+```sh
+$ rpm -ihv daq-2.0.5-1.centos7.x86_64.rpm snort-2.9.7.3-1.centos7.x86_64.rpm
+```
+
+Sprawdzamy pliki konfiguracyjne :
+```sh
+$ rpm ­-ql snort|grep etc
+```
+
+Zarządzamy usługą snort poprzez operacje :
+```sh
+$ service snortd start|stop|reload|status
+```
+
+Przy pierwszej próbie uruchomienia snorta, napotkamy problemy. Należy go dokonfigurować. Samą przyczynę wystąpienia błędu można sprawdzić poprzez :
+```sh
+$ service snortd status
+$ grep snort.conf /var/log/messages
+$ snort -c /etc/snort/snort.conf -T
+```
+
 
