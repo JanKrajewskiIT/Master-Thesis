@@ -27,7 +27,7 @@ $ /media/VBoxLinuxAdditions.run;
 
 W konfiguracji maszyny wirtualnej w VirtualBox'ie w zakładce 'Network' ustawiamy dwa adaptery. Pierwszy 'Host-only Adapter', a drugi 'NAT'. Dzięki tej operacji dostajemy dwa interfejsy sieciowe, a mianowicie : enp0s3 (internetowy) i enp0s8.
 
-## Instalacja pierwszej maszyny
+## Instalacja drugiej maszyny
 
 Drugą maszynę tworzymy instalując system Kali Linux. Dodajemy narzędzie Guest Addition, a także ustawiamy interfejsy sieciowe, analogicznie jak w przypadku maszyny pierwszej.
 
@@ -137,3 +137,34 @@ $ psql -U snort_user -h 127.0.0.1 snort_logs
 ```
 
 ## Konfiguracja programu barnyard2
+
+Pobieramy źródła z repozytorium https://github.com/firnsy/barnyard2/tree/master. Rozpakowujemy barnyard2 i przechodzimy do katalogu barnyard2-master, gdzie wywołujemy :
+```sh
+$ yum install libtool libpcap-devel libdnet-devel
+$ ./autogen.sh
+$ ./configure --with-postgresql
+$ make
+$ make install
+```
+
+Do pliku konfiguracyjnego usr/local/etc/barnyard2.conf dodajemy :
+```sh
+$ gedit /usr/local/etc/barnyard2.conf
+
+output database: alert, postgresql, host=127.0.0.1 port=5432 user=snort_user password=magisterka dbname=snort_logs sensor_name=snort1
+#output database: log, postgresql, host=localhost port=5432 user=snort_user password=magisterka dbname=snort_logs
+config logdir: /tmp
+config waldo_file: /tmp/waldo
+config process_new_records_only
+```
+
+Uruchamiamy program
+```sh
+#Tryb wsadowy
+$ /usr/local/bin/barnyard2 -c /usr/local/etc/barnyard2.conf -o /var/log/snort/snort.log.1438440068
+
+#Tryb daemona
+$ /usr/local/bin/barnyard2 -v -c /usr/local/etc/barnyard2.conf -d /var/log/snort/ -f merged.log
+
+```
+
