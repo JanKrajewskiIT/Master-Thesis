@@ -55,4 +55,49 @@ $ grep snort.conf /var/log/messages
 $ snort -c /etc/snort/snort.conf -T
 ```
 
+Należy teraz zdefiniować zespół reguł. Można je również pobrać z oficjalnej strony snorta.
+```sh
+$ tar -xf snortrules-snapshot-2973.tar.gz
+$ cp rules/* /etc/snort/rules
+
+$ mkdir /etc/snort/rules/preproc_rules
+$ cp preproc_rules/* /etc/snort/rules/preproc_rules
+
+$ mkdir /etc/snort/rules/so_rules
+$ cp so_rules/* /etc/snort/rules/so_rules - tylko pliki .rules
+
+$ cp etc/sid-msg.map /etc/snort
+```
+
+Następnie dokonujemy zmian konfiguracyjnych w pliku snort.conf.
+```sh
+$ gedit /etc/snort/snort.conf
+```
+Podmieniająć :
+```sh
+# dynamicdetection directory /usr/local/lib/snort_dynamicrules
+
+var RULE_PATH /etc/snort/rules
+var SO_RULE_PATH /etc/snort/rules/so_rules
+var PREPROC_RULE_PATH /etc/snort/rules/preproc_rules
+
+include $PREPROC_RULE_PATH/preprocessor.rules
+include $PREPROC_RULE_PATH/decoder.rules
+include $PREPROC_RULE_PATH/sensitive­data.rules
+
+# Reputation preprocessor. For more information see README.reputation
+# preprocessor reputation: \
+#   memcap 500, \
+#   priority whitelist, \
+#   nested_ip inner, \
+#   whitelist $WHITE_LIST_PATH/white_list.rules, \
+#   blacklist $BLACK_LIST_PATH/black_list.rules 
+```
+
+Snorta w trybie daemona uruchamiamy poprzez :
+```sh
+snort -d -D -i enp0s3 -u snort -g snort -c /etc/snort/snort.conf -l /var/log/snort
+```
+
+##Konfiguracja bazy danych dla barnyard2
 
