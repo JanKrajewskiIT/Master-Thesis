@@ -232,10 +232,10 @@ Sprawdzić istniejące procesy można poprzez.
 $ ps aux | less
 ```
 
-Lista wszystkich zdefiniowanych interfacow jest w pliku /proc/net/dev
-Katalog poleceń znajduje się w /usr/sbin/
+Lista wszystkich zdefiniowanych interfacow jest w pliku /proc/net/dev.
+Katalog poleceń znajduje się w /usr/sbin/.
 
-Przy wcześniejszym uruchomieniu usługi snort dobrze zrobić porządki 
+Przy wcześniejszym uruchomieniu usługi snort dobrze zrobić porządki.
 Zarządzamy usługą snort poprzez operacje :
 ```sh
 $ rm /var/log/snort/*
