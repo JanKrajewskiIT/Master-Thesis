@@ -1,0 +1,75 @@
+1. Odpalenie Snorta jako sniffera.
+
+wypisywanie jedynie na ekranie
+snort -v
+
+zapisywanie do pliku logow w wyznaczonym katalogu
+snort -v -l katalog
+
+zapisywanie do pliku logow w postaci binarnej (sybsze)
+snort -v -l katalog -b
+
+odczyt pliku binarnego i wypisanie na konsoli
+snort -r snort.log.1438112254
+
+określenie interfejsu do nasłuchu
+snort -v -i enp0s3
+
+określa zakończenie działania po odsłuchaniu odpowieniej ilości pakietów, w tym przypadku trzech
+snort ­-n 3 -v
+
+Rozszerzone wypisanie nagłówków pakietów ICMP:
+snort ­-n 1 -­e -­v icmp
+
+Wypisanie pakietów UDP DNS wraz z zawartością w postaci tekstowej:
+snort -­n 2 -­dveC udp port 53
+
+Odczyt z pliku z zamaskowaniem adresów IP:
+snort ­-v -O ­-r snort.log.1197538673
+
+Plik tworzony przez polecenie snort, ma taki sam format jak ten od tcpdump
+tcpdump -vvv -r snort.log.1438112254
+
+Zapis pakietów w trybie ascii:
+snort -l . -K ascii -i enp0s3 -n 10
+cat 10.0.2.15/TCP:59390-443
+
+2. Usuwanie postgresa
+
+rpm -e postgresql-devel
+rpm -e postgresql
+rpm -e postgresql-server
+rpm -e postgresql-contrib
+rpm -e postgresql-libs
+rpm -e postgresql-client
+
+yum remove postgres\*
+mv /var/lib/pgsql /var/lib/old.pgsql
+
+
+3. Instalacja postgresa 9.5
+
+http://www.liquidweb.com/kb/how-to-install-and-connect-to-postgresql-on-centos-7/
+sudo su
+rpm -iUvh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-1.noarch.rpm
+yum -y update
+yum -y install postgresql95 postgresql95-server postgresql95-contrib postgresql95-libs --disablerepo=* --enablerepo=pgdg95
+systemctl enable postgresql-9.5
+/usr/pgsql-9.5/bin/postgresql95-setup initdb
+systemctl start postgresql-9.5
+
+gedit /var/lib/pgsql/9.5/data/pg_hba.conf
+
+4. Dokonfigurowanie barnyard2
+
+Można przekopiować komendę do /usr/bin aby była widoczna bezpośrednio w konsoli.
+
+cp /usr/local/bin/barnyard2 /usr/bin
+
+cp /usr/local/bin/barnyard2 /etc/init.d/
+chmod +x /etc/init.d/barnyard2
+cp /usr/local/etc/barnyard2.conf /etc/sysconfig/barnyard2
+chkconfig -add barnyard2
+
+
+

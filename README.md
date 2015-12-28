@@ -170,7 +170,7 @@ $ /usr/local/bin/barnyard2 -v -c /usr/local/etc/barnyard2.conf -d /var/log/snort
 
 ```
 
-###Dokonfigurowanie barnyard2 cd...
+Dokonfigurowanie barnyard2 cd...
 
 ## Konfiguracja Snort'a
 
@@ -214,6 +214,15 @@ Firewalld można zarządzać poprzez szynę D-BUS między innymi komendami :
 $ firewall-cmd --get-active-zones
 $ firewall-cmd --zone=public --add-port=2888/tcp --permanent
 $ firewall-cmd --reload
+$ firewall-cmd --zone=block --list-ports
+```
+
+Metody pomocnicze
+```sh
+$ nmap -sT -O localhost
+$ sudo lsof -i
+$ sudo netstat -lptu
+$ sudo netstat -tulpn
 ```
 
 ## Inne 
@@ -224,3 +233,12 @@ $ ps aux | less
 ```
 
 Lista wszystkich zdefiniowanych interfacow jest w pliku /proc/net/dev
+Katalog poleceń znajduje się w /usr/sbin/
+
+Przy wcześniejszym uruchomieniu usługi snort dobrze zrobić porządki 
+Zarządzamy usługą snort poprzez operacje :
+```sh
+$ rm /var/log/snort/*
+$ service snortd start|stop|reload|status
+$ service postgresql start|stop|reload|status
+```
