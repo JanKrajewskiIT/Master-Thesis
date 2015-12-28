@@ -8,6 +8,7 @@
 - Konfiguracja Snort'a
 - Firewall
 - Inne
+- TODO
 
 ## Wstęp
 
@@ -253,3 +254,5 @@ $ rm /var/log/snort/*
 $ service snortd start|stop|reload|status
 $ service postgresql start|stop|reload|status
 ```
+
+## TODO
