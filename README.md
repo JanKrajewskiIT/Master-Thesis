@@ -147,6 +147,8 @@ $ make
 $ make install
 ```
 
+Program barnyard2 został zainstalowany w katalogu /usr/local/bin/
+
 Do pliku konfiguracyjnego usr/local/etc/barnyard2.conf dodajemy :
 ```sh
 $ gedit /usr/local/etc/barnyard2.conf
@@ -168,3 +170,57 @@ $ /usr/local/bin/barnyard2 -v -c /usr/local/etc/barnyard2.conf -d /var/log/snort
 
 ```
 
+###Dokonfigurowanie barnyard2 cd...
+
+## Konfiguracja Snort'a
+
+Należy dokonać edycji plików konfiguracyjnych tak by Snort współgrał z systemem i programem barnyard2 :
+```sh
+$ gedit /etc/sysconfig/snort
+
+INTERFACE=enp0s3
+# ALERTMODE=fast
+BINARY_LOG=0
+```
+
+```sh
+$ gedit /etc/snort/snort.conf 
+
+output unified2: filename merged.log, limit 128
+```
+
+Można uruchomić Snort'a jako sieciowego IDS'a można poprzez :
+```sh
+$ snort -c /etc/snort/snort.conf
+$ snort -A fast -b -d -D -i enp0s3 -u snort -g snort -c /etc/snort/snort.conf -l /var/log/snort
+$ ps aux|grep snort
+```
+
+Ostatecznie jednak uruchamiamy Snort'a bez opcji -b i -A, oraz sprawdzamy zawartość wygenerowanych log`ów :
+```sh
+$ snort -d -D -i enp0s3 -u snort -g snort -c /etc/snort/snort.conf -l /var/log/snort
+$ file /var/log/snort/snort.log.1438440068
+$ u2spewfoo /var/log/snort/snort.log.1438440068 |head
+```
+
+## Firewall
+Należy doinstalować service do iptables
+```sh
+$ yum install iptables-services
+```
+
+Firewalld można zarządzać poprzez szynę D-BUS między innymi komendami :
+```sh
+$ firewall-cmd --get-active-zones
+$ firewall-cmd --zone=public --add-port=2888/tcp --permanent
+$ firewall-cmd --reload
+```
+
+## Inne 
+
+Sprawdzić istniejące procesy można poprzez.
+```sh
+$ ps aux | less
+```
+
+Lista wszystkich zdefiniowanych interfacow jest w pliku /proc/net/dev
