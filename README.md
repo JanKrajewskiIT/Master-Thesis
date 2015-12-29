@@ -1,4 +1,5 @@
 # Konfiguracja systemu
+
 - Wstęp
 - Instalacja pierwszej maszyny
 - Instalacja drugiej maszyny
