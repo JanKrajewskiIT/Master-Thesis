@@ -155,10 +155,58 @@ $ gedit /usr/local/etc/barnyard2.conf
 
 output database: alert, postgresql, host=127.0.0.1 port=5432 user=snort_user password=magisterka dbname=snort_logs sensor_name=snort1
 #output database: log, postgresql, host=localhost port=5432 user=snort_user password=magisterka dbname=snort_logs
-config logdir: /tmp
+
+#config logdir: /tmp
+config logdir: /var/log/snort
+#config interface:  eth0
+config interface: enp0s3
 config waldo_file: /tmp/waldo
 config process_new_records_only
+
+output alert_fast: stdout
+output mgr_firewalld: stdout
+output mgr_iptables: stdout
+output mgr_nftables: stdout
 ```
+
+Bez zmiany natomiast pozostawiamy konfigurację domyślną dotyczącą położenia plików konfiguracyjnych snorta.
+
+```sh
+config reference_file:      /etc/snort/reference.config
+config classification_file: /etc/snort/classification.config
+config gen_file:            /etc/snort/gen-msg.map
+config sid_file:            /etc/snort/sid-msg.map
+
+input unified2
+```
+Następnym krokiem będzie przygotowanie skryptu startowego.
+```sh
+$ cp rpm/barnyard2 /etc/init.d/barnyard2
+$ cp rpm/barnyard2.config /etc/sysconfig/barnyard2
+$ chmod +x /etc/init.d/barnyard2
+$ chkconfig --add barnyard2
+$ chkconfig barnyard2 on
+```
+
+Ważne jest w tym przypadku przygotowanie dobrej konfiguracji dla skryptu startowego
+```sh
+$ gedit /etc/sysconfig/barnyard2
+
+LOG_FILE="merged.log"
+SNORTDIR="/var/log/snort"
+INTERFACES="enp0s3"
+CONF=/etc/snort/barnyard2.conf
+EXTRA_ARGS=""
+```
+
+Do tego wszystkiego należy stworzyć odpowiednie powiązania, a także utworzyć katalog archiwum.
+```sh
+$ ln -s /usr/local/etc/barnyard2.conf /etc/snort/barnyard2.conf
+$ ln -s /usr/local/bin/barnyard2 /usr/bin
+$ mkdir /var/log/snort/enp0s3/archive
+```
+
+DOPRACOWAĆ TE SKRYPTY STARTOWE I SERWISY DLA SNORT I BARNYARD2
 
 Uruchamiamy program
 ```sh
@@ -217,19 +265,12 @@ $ firewall-cmd --reload
 $ firewall-cmd --zone=block --list-ports
 ```
 
-Metody pomocnicze
-```sh
-$ nmap -sT -O localhost
-$ sudo lsof -i
-$ sudo netstat -lptu
-$ sudo netstat -tulpn
-```
-
 ## Inne 
 
 Sprawdzić istniejące procesy można poprzez.
 ```sh
 $ ps aux | less
+$ ps aux | grep barnyard2
 ```
 
 Lista wszystkich zdefiniowanych interfacow jest w pliku /proc/net/dev.
@@ -241,4 +282,12 @@ Zarządzamy usługą snort poprzez operacje :
 $ rm /var/log/snort/*
 $ service snortd start|stop|reload|status
 $ service postgresql start|stop|reload|status
+```
+
+Metody pomocnicze
+```sh
+$ nmap -sT -O localhost
+$ sudo lsof -i
+$ sudo netstat -lptu
+$ sudo netstat -tulpn
 ```
