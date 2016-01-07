@@ -1543,6 +1543,21 @@ void Barnyard2ConfFree(Barnyard2Config *bc)
 	free(bc->batch_filelist);
     }
 
+    /* For master thesis */
+
+    if(bc->firewall_lock_type != NULL) {
+		free(bc->firewall_lock_type);
+		bc->firewall_lock_type = NULL;
+    }
+    if(bc->firewall_lock_mode != NULL) {
+		free(bc->firewall_lock_mode);
+		bc->firewall_lock_mode = NULL;
+    }
+    if(bc->firewall_lock_events != NULL) {
+		free(bc->firewall_lock_events);
+		bc->firewall_lock_events = NULL;
+    }
+
     FreeSigSuppression(&bc->ssHead);
     FreeSigNodes(&bc->sigHead);
     FreeClassifications(&bc->classifications);

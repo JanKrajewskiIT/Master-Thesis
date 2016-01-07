@@ -50,10 +50,9 @@ echo "Przywracanie ustawień domyślnych nftables..."
 
 echo "Uruchomienie daemon'a snort'a..."
 rm /var/log/snort/*
-systemctl restart snortd
-#systemctl start snortd
-#systemctl reload snortd
-#snort -d -D -i enp0s3 -u snort -g snort -c /etc/snort/snort.conf -l /var/log/snort
+systemctl start snortd
+systemctl reload snortd
+snort -d -D -i enp0s3 -u snort -g snort -c /etc/snort/snort.conf -l /var/log/snort
 
 echo "Uruchomienie systemu postgresql..."
 systemctl start postgresql

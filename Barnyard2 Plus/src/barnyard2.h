@@ -419,6 +419,13 @@ typedef struct _Barnyard2Config
     char **batch_filelist;
     char *archive_dir;
 
+    /*For master thesis*/
+    char *firewall_lock_type;
+    char *firewall_lock_mode;
+    int firewall_lock_time;
+    long firewall_lock_occurances;
+    char **firewall_lock_events;
+
     Spooler *spooler; /* Used to know if we need to call spoolerClose */
 
 } Barnyard2Config;

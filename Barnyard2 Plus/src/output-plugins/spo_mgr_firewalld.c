@@ -18,7 +18,12 @@ static void MgrFirewalldInit(char *args) {
     DEBUG_WRAP(DebugMessage(DEBUG_INIT,"Linking AlertFast functions to call lists...\n"););
     
     /* Set the preprocessor function into the function list */
-    //AddFuncToOutputList(handleFirewalld, OUTPUT_TYPE__ALERT, args);
+    AddFuncToOutputList(handleFirewalld, OUTPUT_TYPE__ALERT, args);
+    printf("Firewall lock type %s \n", barnyard2_conf->firewall_lock_type);
+    printf("Firewall lock mode %s \n", barnyard2_conf->firewall_lock_mode);
+    printf("Firewall lock time %d \n", barnyard2_conf->firewall_lock_time);
+    printf("Firewall lock occurances %d \n", barnyard2_conf->firewall_lock_occurances);
+    printf("Firewall lock events %s \n", barnyard2_conf->firewall_lock_events[0]);
 }
 
 static void handleFirewalld(Packet *p, void *event, uint32_t event_type, void *arg) {

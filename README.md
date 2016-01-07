@@ -1,5 +1,18 @@
 # Konfiguracja systemu
 
+- Wstęp
+- Instalacja pierwszej maszyny
+- Instalacja drugiej maszyny
+- Instalacja i konfiguracja Snort'a
+- Konfiguracja bazy danych dla barnyard2
+- Konfiguracja programu barnyard2
+- Konfiguracja Snort'a
+- Firewall
+- Inne
+- TODO
+
+## Wstęp
+
 Do realizacji tematu wykorzystano dwie maszyny wirtualne posiadające różne systemy. Pierwsza zawierała system operacyjny Centos w wersji siódmej, na której zainstalowano takie narzędzia jak : Snort, Barnyard2, Postgresql itp. Na drugiej zainstalowano system Kali Linux posiadający zestaw narzędzi do przeprowadzania testów penetracyjnych serwera. 
 
 ## Instalacja pierwszej maszyny
@@ -291,3 +304,5 @@ $ sudo lsof -i
 $ sudo netstat -lptu
 $ sudo netstat -tulpn
 ```
+
+## TODO

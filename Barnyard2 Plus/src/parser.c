@@ -229,6 +229,14 @@ static const ConfigFunc config_opts[] =
     { CONFIG_OPT__MAX_MPLS_LABELCHAIN_LEN, 0, 1, ConfigMaxMplsLabelChain },
     { CONFIG_OPT__MPLS_PAYLOAD_TYPE, 0, 1, ConfigMplsPayloadType },
 #endif
+
+    /*For master thesis*/
+    { CINFUG_OPT__FIREWALL_LOCK_TYPE, 1, 1, ConfigFirewallLockType},
+    { CINFUG_OPT__FIREWALL_LOCK_MODE, 1, 1, ConfigFirewallLockMode},
+    { CINFUG_OPT__FIREWALL_LOCK_TIME, 1, 1, ConfigFirewallLockTime},
+    { CINFUG_OPT__FIREWALL_LOCK_OCCURANCES, 1, 1, ConfigFirewallLockOccurances},
+    { CINFUG_OPT__FIREWALL_LOCK_EVENTS, 1, 0, ConfigFirewallLockEvents},
+
     { NULL, 0, 0, NULL }   /* Marks end of array */
 };
 
@@ -2726,6 +2734,48 @@ void ConfigMplsPayloadType(Barnyard2Config *bc, char *args)
     }
 }
 #endif
+
+/* For master thesis */
+void ConfigFirewallLockType(Barnyard2Config *bc, char *args) {
+    if ((args == NULL) || (bc == NULL) || (bc->firewall_lock_type != NULL)) return;
+    bc->firewall_lock_type = SnortStrdup(args);
+}
+
+void ConfigFirewallLockMode(Barnyard2Config *bc, char *args) {
+    if ((args == NULL) || (bc == NULL) || (bc->firewall_lock_mode != NULL)) return;
+    bc->firewall_lock_mode = SnortStrdup(args);
+}
+
+void ConfigFirewallLockTime(Barnyard2Config *bc, char *args) {
+    if ((args == NULL) || (bc == NULL)) return;
+
+    int lock_time = atoi(args);
+
+    if ((errno == ERANGE) || (lock_time < 0) || (lock_time & ~FILEACCESSBITS)) {
+        ParseError("Bad firewall lock time: %s", args);
+    }
+
+    bc->firewall_lock_time = lock_time;
+}
+
+void ConfigFirewallLockOccurances(Barnyard2Config *bc, char *args) {
+    if ((args == NULL) || (bc == NULL)) return;
+
+    int lock_occurances = atoi(args);
+
+    if ((errno == ERANGE) || (lock_occurances < 0) || (lock_occurances & ~FILEACCESSBITS)) {
+        ParseError("Bad firewall lock occurances: %s", args);
+    }
+
+    bc->firewall_lock_occurances = lock_occurances;
+}
+
+void ConfigFirewallLockEvents(Barnyard2Config *bc, char *args) {
+    if( (bc == NULL) || (args == NULL)) return;
+
+    int num_toks = 0;
+    bc->firewall_lock_events = mSplit(args, ",", 0, &num_toks, 0);
+}
 
 #ifdef SUP_IP6
 static void ParseIpVar(Barnyard2Config *bc, char *args)
