@@ -420,6 +420,7 @@ typedef struct _Barnyard2Config
     char *archive_dir;
 
     /*For master thesis*/
+    char *firewall_type;
     char *firewall_lock_type;
     char *firewall_lock_mode;
     int firewall_lock_time;

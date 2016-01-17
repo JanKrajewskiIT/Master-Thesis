@@ -83,11 +83,12 @@
 #endif  /* MPLS */
 
 /*For master thesis*/
-#define CINFUG_OPT__FIREWALL_LOCK_TYPE				"firewall_lock_type"
-#define CINFUG_OPT__FIREWALL_LOCK_MODE 				"firewall_lock_mode"
-#define CINFUG_OPT__FIREWALL_LOCK_TIME 				"firewall_lock_time"
-#define CINFUG_OPT__FIREWALL_LOCK_OCCURANCES 		"firewall_lock_occurances"
-#define CINFUG_OPT__FIREWALL_LOCK_EVENTS 			"firewall_lock_events"
+#define CONFIG_OPT__FIREWALL_TYPE					"firewall_type"
+#define CONFIG_OPT__FIREWALL_LOCK_TYPE				"firewall_lock_type"
+#define CONFIG_OPT__FIREWALL_LOCK_MODE 				"firewall_lock_mode"
+#define CONFIG_OPT__FIREWALL_LOCK_TIME 				"firewall_lock_time"
+#define CONFIG_OPT__FIREWALL_LOCK_OCCURANCES 		"firewall_lock_occurances"
+#define CONFIG_OPT__FIREWALL_LOCK_EVENTS 			"firewall_lock_events"
 
 /* exported values */
 extern char *file_name;
@@ -159,6 +160,7 @@ void ConfigMplsPayloadType(Barnyard2Config *, char *);
 #endif
 
 /* For master thesis */
+void ConfigFirewallType(Barnyard2Config *bc, char *args);
 void ConfigFirewallLockType(Barnyard2Config *bc, char *args);
 void ConfigFirewallLockMode(Barnyard2Config *bc, char *args);
 void ConfigFirewallLockTime(Barnyard2Config *bc, char *args);
