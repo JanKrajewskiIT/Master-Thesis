@@ -10,9 +10,9 @@ typedef struct _FirewallData {
 
 FirewallData *prepareFirewallData(Packet *p, void *event);
 char* format(const char *format,...);
-void printParameters();
 bool isAdverseAction(FirewallData *data);
-
+void printParameters();
+void printEvents();
 
 #endif
 

@@ -37,7 +37,6 @@ FirewallData *prepareFirewallData(Packet *p, void *event) {
 	return data;
 }
 
-
 char* format(const char *format,...) {
     char buf[STD_BUF+1];
     va_list ap;
@@ -61,10 +60,46 @@ bool isAdverseAction(FirewallData *data) {
 }
 
 void printParameters() {
-    printf("Firewall type %d \n", barnyard2_conf->firewall_type);
-    printf("Firewall lock type %d \n", barnyard2_conf->firewall_lock_type);
-    printf("Firewall lock mode %d \n", barnyard2_conf->firewall_lock_mode);
-    printf("Firewall lock time %d \n", barnyard2_conf->firewall_lock_time);
-    printf("Firewall lock occurances %d \n", barnyard2_conf->firewall_lock_occurances);
-    printf("Firewall lock events %s \n", barnyard2_conf->firewall_lock_events[0]);
+
+    if(barnyard2_conf->firewall_type == FIREWALLD) {
+        printf("Firewall type : FIREWALLD \n");
+    } else if(barnyard2_conf->firewall_type == IPTABLES) {
+        printf("Firewall type : IPTABLES \n");
+    } else if(barnyard2_conf->firewall_type == NFTABLES) {
+        printf("Firewall type : NFTABLES \n");
+    } else if(barnyard2_conf->firewall_type == NONE_TYPE) {
+        printf("Firewall type : NONE_TYPE \n");
+    }
+
+    if(barnyard2_conf->firewall_lock_type == IMMEDIATE) {
+    	printf("Firewall lock type : IMMEDIATE \n");
+    } else if(barnyard2_conf->firewall_lock_type == OCCURANCES_DEPENDENT) {
+    	printf("Firewall lock type : OCCURANCES_DEPENDENT \n");
+    } else if(barnyard2_conf->firewall_lock_type == NONE_LOCK_TYPE) {
+    	printf("Firewall lock type : NONE_LOCK_TYPE \n");
+    }
+
+    if(barnyard2_conf->firewall_lock_mode == TEMPORARY) {
+        printf("Firewall lock mode : TEMPORARY \n");
+    } else if(barnyard2_conf->firewall_lock_mode == PERMANENT) {
+        printf("Firewall lock mode : PERMANENT \n");
+    } else if(barnyard2_conf->firewall_lock_mode == NONE_LOCK_MODE) {
+        printf("Firewall lock mode : NONE_LOCK_MODE \n");
+    }
+
+    printf("Firewall lock time : %d \n", barnyard2_conf->firewall_lock_time);
+    printf("Firewall lock occurances : %d \n", barnyard2_conf->firewall_lock_occurances);
+    printEvents();
+
+}
+
+
+void printEvents() {
+    int i;
+    printf("Event statistics : \n");
+    for(i = 0; i < barnyard2_conf->firewall_lock_num_events; i++) {
+    	printf("Event with gid %d sid %d and count %d \n", firewall_events[i].generator_id,
+    			firewall_events[i].signature_id, firewall_events[i].occurences);
+    }
+    printf("\n");
 }

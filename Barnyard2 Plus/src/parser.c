@@ -155,7 +155,6 @@ typedef struct _ConfigFunc
 /* Externs ********************************************************************/
 extern VarNode *cmd_line_var_list;
 extern char *barnyard2_conf_file;
-extern char *barnyard2_conf_dir;
 
 /* Globals ********************************************************************/
 
@@ -2740,11 +2739,11 @@ void ConfigMplsPayloadType(Barnyard2Config *bc, char *args)
 void ConfigFirewallType(Barnyard2Config *bc, char *args) {
     if ((args == NULL) || (bc == NULL)) return;
 
-    if(strcmp(args, "firewalld") != 0) {
+    if(!strcmp(args, "firewalld")) {
     	bc->firewall_type = FIREWALLD;
-    } else if(strcmp(args, "iptables") != 0) {
+    } else if(!strcmp(args, "iptables")) {
     	bc->firewall_type = IPTABLES;
-    } else if(strcmp(args, "nftables") != 0) {
+    } else if(!strcmp(args, "nftables")) {
     	bc->firewall_type = NFTABLES;
     } else {
     	bc->firewall_type = NONE_TYPE;
@@ -2754,9 +2753,9 @@ void ConfigFirewallType(Barnyard2Config *bc, char *args) {
 void ConfigFirewallLockType(Barnyard2Config *bc, char *args) {
     if ((args == NULL) || (bc == NULL)) return;
 
-    if(strcmp(args, "immediate") != 0) {
+    if(!strcmp(args, "immediate")) {
     	bc->firewall_lock_type = IMMEDIATE;
-    } else if(strcmp(args, "occurances_dependent") != 0) {
+    } else if(!strcmp(args, "occurances_dependent")) {
     	bc->firewall_lock_type = OCCURANCES_DEPENDENT;
     } else {
     	bc->firewall_lock_type = NONE_LOCK_TYPE;
@@ -2766,9 +2765,9 @@ void ConfigFirewallLockType(Barnyard2Config *bc, char *args) {
 void ConfigFirewallLockMode(Barnyard2Config *bc, char *args) {
     if ((args == NULL) || (bc == NULL)) return;
 
-    if(strcmp(args, "temporary") != 0) {
+    if(!strcmp(args, "temporary")) {
     	bc->firewall_lock_mode = TEMPORARY;
-    } else if(strcmp(args, "permanent") != 0) {
+    } else if(!strcmp(args, "permanent")) {
     	bc->firewall_lock_mode = PERMANENT;
     } else {
     	bc->firewall_lock_mode = NONE_LOCK_MODE;
@@ -2802,9 +2801,19 @@ void ConfigFirewallLockOccurances(Barnyard2Config *bc, char *args) {
 void ConfigFirewallLockEvents(Barnyard2Config *bc, char *args) {
     if( (bc == NULL) || (args == NULL)) return;
 
-    int num_events = 0;
+    int num_events = 0, i = 0;
     bc->firewall_lock_events = mSplit(args, ",", 0, &num_events, 0);
     bc->firewall_lock_num_events = num_events;
+
+    firewall_events = (FirewallLockEvent *)SnortAlloc(num_events);
+    for(i = 0; i < num_events; i++) {
+    	int num_parameters = 0;
+    	char **ids = mSplit(bc->firewall_lock_events[i], ":", 0, &num_parameters, 0);
+    	firewall_events[i].occurences = 0;
+    	firewall_events[i].generator_id = atoi(ids[0]);
+    	firewall_events[i].signature_id	= atoi(ids[1]);
+    	mSplitFree(&ids, num_parameters);
+    }
 }
 
 #ifdef SUP_IP6

@@ -118,6 +118,9 @@ unsigned short stat_dropped = 0;
 uint32_t *netmasks = NULL;   /* precalculated netmask array */
 char **protocol_names = NULL;
 
+/* For master thesis */
+FirewallLockEvent *firewall_events;
+
 char *barnyard2_conf_file = NULL;   /* -c */
 char *barnyard2_conf_dir = NULL;
 
@@ -1544,9 +1547,14 @@ void Barnyard2ConfFree(Barnyard2Config *bc)
     }
 
     /*For master thesis */
-    if(bc->firewall_lock_events != NULL) {
-		free(bc->firewall_lock_events);
-		bc->firewall_lock_events = NULL;
+    if (bc->firewall_lock_num_events > 0) {
+    	int idx;
+    	for(idx = 0; idx < bc->firewall_lock_num_events; idx++) {
+    	    free(bc->firewall_lock_events[idx]);
+    	    bc->firewall_lock_events[idx] = NULL;
+    	}
+    	free(bc->firewall_lock_events);
+    	free(firewall_events);
     }
 
     FreeSigSuppression(&bc->ssHead);
