@@ -22,7 +22,7 @@ static void MgrIptablesInit(char *args) {
 }
 
 static void handleIptables(Packet *p, void *event, uint32_t event_type, void *arg) {
-	FirewallData *data = prepareFirewallData(p);
+	FirewallData *data = prepareFirewallData(p, event);
 	if(data != NULL) {
 		//LogMessage("[%s Port: %u] \n", data->protocol, data->dport);
 		char *command = format(ADD_PORT_COMMAND, data->protocol, data->dport);

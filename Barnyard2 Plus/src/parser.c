@@ -2738,18 +2738,41 @@ void ConfigMplsPayloadType(Barnyard2Config *bc, char *args)
 
 /* For master thesis */
 void ConfigFirewallType(Barnyard2Config *bc, char *args) {
-    if ((args == NULL) || (bc == NULL) || (bc->firewall_type != NULL)) return;
-    bc->firewall_type = SnortStrdup(args);
+    if ((args == NULL) || (bc == NULL)) return;
+
+    if(strcmp(args, "firewalld") != 0) {
+    	bc->firewall_type = FIREWALLD;
+    } else if(strcmp(args, "iptables") != 0) {
+    	bc->firewall_type = IPTABLES;
+    } else if(strcmp(args, "nftables") != 0) {
+    	bc->firewall_type = NFTABLES;
+    } else {
+    	bc->firewall_type = NONE_TYPE;
+    }
 }
 
 void ConfigFirewallLockType(Barnyard2Config *bc, char *args) {
-    if ((args == NULL) || (bc == NULL) || (bc->firewall_lock_type != NULL)) return;
-    bc->firewall_lock_type = SnortStrdup(args);
+    if ((args == NULL) || (bc == NULL)) return;
+
+    if(strcmp(args, "immediate") != 0) {
+    	bc->firewall_lock_type = IMMEDIATE;
+    } else if(strcmp(args, "occurances_dependent") != 0) {
+    	bc->firewall_lock_type = OCCURANCES_DEPENDENT;
+    } else {
+    	bc->firewall_lock_type = NONE_LOCK_TYPE;
+    }
 }
 
 void ConfigFirewallLockMode(Barnyard2Config *bc, char *args) {
-    if ((args == NULL) || (bc == NULL) || (bc->firewall_lock_mode != NULL)) return;
-    bc->firewall_lock_mode = SnortStrdup(args);
+    if ((args == NULL) || (bc == NULL)) return;
+
+    if(strcmp(args, "temporary") != 0) {
+    	bc->firewall_lock_mode = TEMPORARY;
+    } else if(strcmp(args, "permanent") != 0) {
+    	bc->firewall_lock_mode = PERMANENT;
+    } else {
+    	bc->firewall_lock_mode = NONE_LOCK_MODE;
+    }
 }
 
 void ConfigFirewallLockTime(Barnyard2Config *bc, char *args) {
@@ -2779,8 +2802,9 @@ void ConfigFirewallLockOccurances(Barnyard2Config *bc, char *args) {
 void ConfigFirewallLockEvents(Barnyard2Config *bc, char *args) {
     if( (bc == NULL) || (args == NULL)) return;
 
-    int num_toks = 0;
-    bc->firewall_lock_events = mSplit(args, ",", 0, &num_toks, 0);
+    int num_events = 0;
+    bc->firewall_lock_events = mSplit(args, ",", 0, &num_events, 0);
+    bc->firewall_lock_num_events = num_events;
 }
 
 #ifdef SUP_IP6

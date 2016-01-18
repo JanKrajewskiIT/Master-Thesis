@@ -19,15 +19,11 @@ static void MgrFirewalldInit(char *args) {
     
     /* Set the preprocessor function into the function list */
     AddFuncToOutputList(handleFirewalld, OUTPUT_TYPE__ALERT, args);
-    printf("Firewall lock type %s \n", barnyard2_conf->firewall_lock_type);
-    printf("Firewall lock mode %s \n", barnyard2_conf->firewall_lock_mode);
-    printf("Firewall lock time %d \n", barnyard2_conf->firewall_lock_time);
-    printf("Firewall lock occurances %d \n", barnyard2_conf->firewall_lock_occurances);
-    printf("Firewall lock events %s \n", barnyard2_conf->firewall_lock_events[0]);
+    printParameters();
 }
 
 static void handleFirewalld(Packet *p, void *event, uint32_t event_type, void *arg) {
-	FirewallData *data = prepareFirewallData(p);
+	FirewallData *data = prepareFirewallData(p, event);
 	if(data != NULL) {
 		//LogMessage("[%s Port: %u] \n", data->protocol, data->dport);
 		char *command = format(ADD_PORT_COMMAND, data->dport, data->protocol);

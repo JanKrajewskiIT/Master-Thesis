@@ -306,6 +306,27 @@ typedef struct _VarNode
 
 } VarNode;
 
+/* For master thesis */
+typedef enum _FirewallType {
+	FIREWALLD, IPTABLES, NFTABLES, NONE_TYPE = 0
+} FirewallType;
+
+/* For master thesis */
+typedef enum _FirewallLockType {
+	IMMEDIATE, OCCURANCES_DEPENDENT, NONE_LOCK_TYPE = 0
+} FirewallLockType;
+
+/* For master thesis */
+typedef enum _FirewallLockMode {
+	TEMPORARY = 2, PERMANENT = 1, NONE_LOCK_MODE = 0
+} FirewallLockMode;
+
+/* For master thesis, struct for selected events statistics  */
+typedef struct _FirewallLockEvent {
+    uint32_t signature_id;
+    uint32_t generator_id;
+    int occurences;
+} FirewallLockEvent;
 
 /* struct to contain the program variables and command line args */
 typedef struct _Barnyard2Config
@@ -420,12 +441,15 @@ typedef struct _Barnyard2Config
     char *archive_dir;
 
     /*For master thesis*/
-    char *firewall_type;
-    char *firewall_lock_type;
-    char *firewall_lock_mode;
-    int firewall_lock_time;
-    long firewall_lock_occurances;
+    FirewallType firewall_type;
+    FirewallLockType firewall_lock_type;
+    FirewallLockMode firewall_lock_mode;
+
     char **firewall_lock_events;
+
+    unsigned int firewall_lock_num_events;
+    unsigned int firewall_lock_time;
+    unsigned int firewall_lock_occurances;
 
     Spooler *spooler; /* Used to know if we need to call spoolerClose */
 
@@ -567,6 +591,8 @@ extern int datalink;          /* the datalink value */
 extern PacketCount pc;        /* packet count information */
 extern char **protocol_names;
 
+/* For master thesis */
+extern FirewallLockEvent *firewall_events;
 
 extern char *progname;        /* name of the program (from argv[0]) */
 extern char **progargs;
