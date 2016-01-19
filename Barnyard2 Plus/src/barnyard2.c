@@ -201,10 +201,7 @@ static struct option long_options[] =
 /* for getopt */
 extern char *optarg;
 extern int optind;
-extern int opterr;
 extern int optopt;
-
-
 
 /* Private function prototypes ************************************************/
 static void InitNetmasks(void);
@@ -2217,4 +2214,3 @@ static void FreeOutputConfigs(OutputConfig *head)
         free(tmp);
     }
 }
-

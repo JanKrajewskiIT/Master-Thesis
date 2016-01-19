@@ -2737,43 +2737,64 @@ void ConfigMplsPayloadType(Barnyard2Config *bc, char *args)
 
 /* For master thesis */
 void ConfigFirewallType(Barnyard2Config *bc, char *args) {
-    if ((args == NULL) || (bc == NULL)) return;
 
-    if(!strcmp(args, "firewalld")) {
+	if(bc == NULL) return;
+
+	if(args != NULL) {
+	    if(strcasecmp(args, "firewalld") == 0) {
+	    	bc->firewall_type = FIREWALLD;
+	    } else if(strcasecmp(args, "iptables") == 0) {
+	    	bc->firewall_type = IPTABLES;
+	    } else if(strcasecmp(args, "nftables") == 0) {
+	    	bc->firewall_type = NFTABLES;
+	    } else {
+	        ParseError("Non supported firewall type: %s.", args);
+	    }
+	} else {
     	bc->firewall_type = FIREWALLD;
-    } else if(!strcmp(args, "iptables")) {
-    	bc->firewall_type = IPTABLES;
-    } else if(!strcmp(args, "nftables")) {
-    	bc->firewall_type = NFTABLES;
-    } else {
-    	bc->firewall_type = NONE_TYPE;
-    }
+	}
+
 }
 
+/* For master thesis */
 void ConfigFirewallLockType(Barnyard2Config *bc, char *args) {
-    if ((args == NULL) || (bc == NULL)) return;
 
-    if(!strcmp(args, "immediate")) {
-    	bc->firewall_lock_type = IMMEDIATE;
-    } else if(!strcmp(args, "occurances_dependent")) {
-    	bc->firewall_lock_type = OCCURANCES_DEPENDENT;
-    } else {
-    	bc->firewall_lock_type = NONE_LOCK_TYPE;
-    }
+	if(bc == NULL) return;
+
+	if(args != NULL) {
+		if(strcasecmp(args, "immediate") == 0) {
+			bc->firewall_lock_type = IMMEDIATE;
+		} else if(strcasecmp(args, "occurances_dependent") == 0) {
+			bc->firewall_lock_type = OCCURANCES_DEPENDENT;
+		} else {
+			ParseError("Non supported firewall lock type: %s.", args);
+		}
+	} else {
+		bc->firewall_lock_type = IMMEDIATE;
+	}
+
 }
 
+/* For master thesis */
 void ConfigFirewallLockMode(Barnyard2Config *bc, char *args) {
-    if ((args == NULL) || (bc == NULL)) return;
 
-    if(!strcmp(args, "temporary")) {
-    	bc->firewall_lock_mode = TEMPORARY;
-    } else if(!strcmp(args, "permanent")) {
-    	bc->firewall_lock_mode = PERMANENT;
-    } else {
-    	bc->firewall_lock_mode = NONE_LOCK_MODE;
-    }
+	if(bc == NULL) return;
+
+	if(args != NULL) {
+		if(strcasecmp(args, "temporary") == 0) {
+			bc->firewall_lock_mode = TEMPORARY;
+		} else if(strcasecmp(args, "permanent") == 0) {
+			bc->firewall_lock_mode = PERMANENT;
+		} else {
+			ParseError("Non supported firewall lock mode: %s.", args);
+		}
+	} else {
+		bc->firewall_lock_mode = PERMANENT;
+	}
+
 }
 
+/* For master thesis */
 void ConfigFirewallLockTime(Barnyard2Config *bc, char *args) {
     if ((args == NULL) || (bc == NULL)) return;
 
@@ -2786,6 +2807,7 @@ void ConfigFirewallLockTime(Barnyard2Config *bc, char *args) {
     bc->firewall_lock_time = lock_time;
 }
 
+/* For master thesis */
 void ConfigFirewallLockOccurances(Barnyard2Config *bc, char *args) {
     if ((args == NULL) || (bc == NULL)) return;
 
@@ -2798,6 +2820,9 @@ void ConfigFirewallLockOccurances(Barnyard2Config *bc, char *args) {
     bc->firewall_lock_occurances = lock_occurances;
 }
 
+/* For master thesis
+ jeśli nie podamy eventów to nie ma po co wykonywać jakiekolwiek operacje, czy rejestrować plugin
+ * */
 void ConfigFirewallLockEvents(Barnyard2Config *bc, char *args) {
     if( (bc == NULL) || (args == NULL)) return;
 
@@ -2808,7 +2833,13 @@ void ConfigFirewallLockEvents(Barnyard2Config *bc, char *args) {
     firewall_events = (FirewallLockEvent *)SnortAlloc(num_events);
     for(i = 0; i < num_events; i++) {
     	int num_parameters = 0;
-    	char **ids = mSplit(bc->firewall_lock_events[i], ":", 0, &num_parameters, 0);
+    	char **ids = mSplit(bc->firewall_lock_events[i], ":", 2, &num_parameters, 0);
+
+    	if(num_parameters != 2) {
+        	mSplitFree(&ids, num_parameters);
+            ParseError("Bad firewall lock event id: %s", bc->firewall_lock_events[i]);
+    	}
+
     	firewall_events[i].occurences = 0;
     	firewall_events[i].generator_id = atoi(ids[0]);
     	firewall_events[i].signature_id	= atoi(ids[1]);

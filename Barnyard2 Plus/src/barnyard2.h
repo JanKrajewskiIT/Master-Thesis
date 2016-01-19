@@ -308,17 +308,17 @@ typedef struct _VarNode
 
 /* For master thesis */
 typedef enum _FirewallType {
-	FIREWALLD, IPTABLES, NFTABLES, NONE_TYPE
+	FIREWALLD, IPTABLES, NFTABLES
 } FirewallType;
 
 /* For master thesis */
 typedef enum _FirewallLockType {
-	IMMEDIATE, OCCURANCES_DEPENDENT, NONE_LOCK_TYPE
+	IMMEDIATE, OCCURANCES_DEPENDENT
 } FirewallLockType;
 
 /* For master thesis */
 typedef enum _FirewallLockMode {
-	TEMPORARY, PERMANENT, NONE_LOCK_MODE
+	TEMPORARY, PERMANENT
 } FirewallLockMode;
 
 /* For master thesis, struct for selected events statistics  */

@@ -67,24 +67,24 @@ void printParameters() {
         printf("Firewall type : IPTABLES \n");
     } else if(barnyard2_conf->firewall_type == NFTABLES) {
         printf("Firewall type : NFTABLES \n");
-    } else if(barnyard2_conf->firewall_type == NONE_TYPE) {
-        printf("Firewall type : NONE_TYPE \n");
+    } else {
+        printf("Firewall type : NONE \n");
     }
 
     if(barnyard2_conf->firewall_lock_type == IMMEDIATE) {
     	printf("Firewall lock type : IMMEDIATE \n");
     } else if(barnyard2_conf->firewall_lock_type == OCCURANCES_DEPENDENT) {
     	printf("Firewall lock type : OCCURANCES_DEPENDENT \n");
-    } else if(barnyard2_conf->firewall_lock_type == NONE_LOCK_TYPE) {
-    	printf("Firewall lock type : NONE_LOCK_TYPE \n");
+    } else {
+    	printf("Firewall lock type : NONE \n");
     }
 
     if(barnyard2_conf->firewall_lock_mode == TEMPORARY) {
         printf("Firewall lock mode : TEMPORARY \n");
     } else if(barnyard2_conf->firewall_lock_mode == PERMANENT) {
         printf("Firewall lock mode : PERMANENT \n");
-    } else if(barnyard2_conf->firewall_lock_mode == NONE_LOCK_MODE) {
-        printf("Firewall lock mode : NONE_LOCK_MODE \n");
+    } else {
+        printf("Firewall lock mode : NONE \n");
     }
 
     printf("Firewall lock time : %d \n", barnyard2_conf->firewall_lock_time);
