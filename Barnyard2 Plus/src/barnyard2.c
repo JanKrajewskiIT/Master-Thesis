@@ -160,7 +160,7 @@ static char **barnyard2_argv = NULL;
 /* command line options for getopt */
 #ifndef WIN32
 /* Unix does not support an argument to -s <wink marty!> OR -E, -W */
-static char *valid_options = "?a:Ac:C:d:Def:Fg:G:h:i:Il:m:noOqr:R:S:t:Tu:UvVw:xXy";
+static char *valid_options = "?a:Ac:C:d:Def:Fg:G:h:i:Il:m:noOqr:R:S:t:Tu:UvVw:xXy:j:k:K:z:Z:"; /*For master thesis*/
 #else
 /* Win32 does not support:  -D, -g, -m, -t, -u */
 /* Win32 no longer supports an argument to -s, either! */
@@ -187,6 +187,13 @@ static struct option long_options[] =
    {"event-cache-size", LONGOPT_ARG_REQUIRED, NULL, EVENT_CACHE_SIZE},
    {"alert-on-each-packet-in-stream", LONGOPT_ARG_NONE, NULL, ALERT_ON_EACH_PACKET_IN_STREAM},
    {"process-new-records-only", LONGOPT_ARG_NONE, NULL, 'n'},
+
+   /** For master thesis */
+   {"firewall-type", LONGOPT_ARG_REQUIRED, NULL, 'j'},
+   {"firewall-lock-type", LONGOPT_ARG_REQUIRED, NULL, 'k'},
+   {"firewall-lock-mode", LONGOPT_ARG_REQUIRED, NULL, 'z'},
+   {"firewall-lock-time", LONGOPT_ARG_REQUIRED, NULL, 'K'},
+   {"firewall-lock-occurances", LONGOPT_ARG_REQUIRED, NULL, 'Z'},
 
 #ifdef MPLS
    {"max-mpls-labelchain-len", LONGOPT_ARG_REQUIRED, NULL, MAX_MPLS_LABELCHAIN_LEN},
@@ -512,7 +519,17 @@ static int ShowUsage(char *program_name)
     FPUTS_BOTH ("        -d <dir>   Spool files from <dir>\n");
     FPUTS_BOTH ("        -n         Only process new events\n");
     FPUTS_BOTH ("        -w <file>  Enable bookmarking using <file>\n");
+    FPUTS_BOTH ("\n");
+
+    /* For master thesis */
+    FPUTS_BOTH ("Additional Options For Master Thesis:\n");
+    FPUTS_BOTH ("        -j <type>   Select firewall type [firewalld|iptables|nftables] \n");
+    FPUTS_BOTH ("        -k <type>   Select firewall lock type [immediate|occurances_dependent] \n");
+    FPUTS_BOTH ("        -K <number> Set after how many occurances of event appears lock \n");
+    FPUTS_BOTH ("        -z <type>   Select firewall lock mode [temporary|permanent] \n");
+    FPUTS_BOTH ("        -Z <time>   Set lock time in seconds \n");
 	FPUTS_BOTH ("\n");
+
     FPUTS_BOTH ("Batch Processing Mode Options:\n");
     FPUTS_BOTH ("        -o         Enable batch processing mode\n");
 	FPUTS_BOTH ("\n");
@@ -639,6 +656,7 @@ static void ParseCmdLine(int argc, char **argv)
     optind = 0; /* in case we are being re-invoked , think HUP */
 
     /* loop through each command line var and process it */
+
     while ((ch = getopt_long(argc, argv, valid_options, long_options, &option_index)) != -1)
     {
         DEBUG_WRAP(DebugMessage(DEBUG_INIT, "Processing cmd line switch: %c\n", ch););
@@ -665,7 +683,7 @@ static void ParseCmdLine(int argc, char **argv)
                 ConfigDisableAlertOnEachPacketInStream(bc, NULL);
                 break;
 
-           case EVENT_CACHE_SIZE:
+            case EVENT_CACHE_SIZE:
                 ConfigSetEventCacheSize(bc,optarg);
                 break;
 
@@ -682,6 +700,27 @@ static void ParseCmdLine(int argc, char **argv)
                 ConfigMplsPayloadType(bc, optarg);
                 break;
 #endif
+
+			/** For master thesis */
+			case 'j':
+				ConfigFirewallType(bc, optarg);
+				break;
+
+			case 'k':
+				ConfigFirewallLockType(bc, optarg);
+				break;
+
+			case 'K':
+				ConfigFirewallLockOccurances(bc, optarg);
+				break;
+
+			case 'z':
+				ConfigFirewallLockMode(bc, optarg);
+				break;
+
+			case 'Z':
+				ConfigFirewallLockTime(bc, optarg);
+				break;
 
             case 'a':  /* use archive directory <x> */
                 ConfigArchiveDir(bc, optarg);
@@ -735,8 +774,6 @@ static void ParseCmdLine(int argc, char **argv)
             case 'g':   /* setgid */
                 ConfigSetGid(bc, optarg);
                 break;
-
-
 
             case 'h':
                 ConfigHostname(bc, optarg);
@@ -806,12 +843,12 @@ static void ParseCmdLine(int argc, char **argv)
                 break;
 
      	    case 'S':  /* set a rules file variable */
-		bc->sid_msg_file = strndup(optarg,PATH_MAX);
-		break;
+				bc->sid_msg_file = strndup(optarg,PATH_MAX);
+				break;
 		
-   	    case 'G':  /* snort preprocessor identifier */
-		bc->gen_msg_file = strndup(optarg,PATH_MAX);
-		break;
+			case 'G':  /* snort preprocessor identifier */
+				bc->gen_msg_file = strndup(optarg,PATH_MAX);
+				break;
 
             case 't':  /* chroot to the user specified directory */
                 ConfigChrootDir(bc, optarg);
@@ -1915,6 +1952,23 @@ static Barnyard2Config * MergeBarnyard2Confs(Barnyard2Config *cmd_line, Barnyard
         config_file->batch_filelist = cmd_line->batch_filelist;
         cmd_line->batch_filelist = NULL;
         cmd_line->batch_total_files = 0;
+    }
+
+    /** For master thesis */
+    if(cmd_line->firewall_type == FIREWALLD || cmd_line->firewall_type == IPTABLES || cmd_line->firewall_type == NFTABLES) {
+        config_file->firewall_type = cmd_line->firewall_type;
+    }
+    if(cmd_line->firewall_lock_type == IMMEDIATE || cmd_line->firewall_lock_type == OCCURANCES_DEPENDENT) {
+        config_file->firewall_lock_type = cmd_line->firewall_lock_type;
+    }
+    if(config_file->firewall_lock_mode == TEMPORARY || config_file->firewall_lock_mode == PERMANENT) {
+    	config_file->firewall_lock_mode = cmd_line->firewall_lock_mode;
+    }
+    if(cmd_line->firewall_lock_occurances > 0) {
+        config_file->firewall_lock_occurances = cmd_line->firewall_lock_occurances;
+    }
+    if(cmd_line->firewall_lock_time > 0) {
+    	config_file->firewall_lock_time = cmd_line->firewall_lock_time;
     }
 
     return config_file;
