@@ -1,5 +1,6 @@
 #include "spo_lock_utils.h"
 #include "unified2.h"
+#include "../sfutil/sf_textlog.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -48,10 +49,16 @@ char* format(const char *format, ...) {
 }
 
 void turnOnProperFirewall() {
+	char *firewall_name = getFirewallName(barnyard2_conf->firewall_type);
+	system(format("systemctl start %s", firewall_name));
+	LogMessage("INFO firewall: Service %s turned on. \n", firewall_name);
 
-	system("service firewalld stop");
-	system("service iptables stop");
-	system("service nftables stop");
+	int i;
+	for(i = FIREWALLD; i <= NFTABLES; i++) {
+		if(i != barnyard2_conf->firewall_type) {
+			system(format("systemctl stop %s", getFirewallName(i)));
+		}
+	}
 }
 
 char* getFirewallName(FirewallType firewallType) {

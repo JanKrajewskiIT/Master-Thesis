@@ -16,6 +16,7 @@ bool isAdverseAction(FirewallData *data);
 void printParameters();
 void printEvents();
 
+void turnOnProperFirewall();
 bool canRegisterPlugin(FirewallType firewallType);
 char* getFirewallName(FirewallType firewallType);
 

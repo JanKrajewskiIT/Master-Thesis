@@ -19,6 +19,7 @@ static void nftablesLockPluginInit(char *args) {
 	if(canRegisterPlugin(NFTABLES)) {
 		DEBUG_WRAP(DebugMessage(DEBUG_INIT,"Output: Linking NftablesLockPlugin functions to call lists...\n"));
 		AddFuncToOutputList(handleNftablesLock, OUTPUT_TYPE__ALERT, args);
+		turnOnProperFirewall();
 	}
 }
 

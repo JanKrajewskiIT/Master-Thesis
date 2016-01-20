@@ -19,6 +19,7 @@ static void firewalldLockPluginInit(char *args) {
 	if(canRegisterPlugin(FIREWALLD)) {
 		DEBUG_WRAP(DebugMessage(DEBUG_INIT,"Output: Linking FirewalldLockPlugin functions to call lists...\n"));
 		AddFuncToOutputList(handleFirewalldLock, OUTPUT_TYPE__ALERT, args);
+		turnOnProperFirewall();
 	}
 }
 

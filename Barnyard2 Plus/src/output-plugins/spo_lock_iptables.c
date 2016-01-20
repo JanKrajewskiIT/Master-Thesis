@@ -19,6 +19,7 @@ static void iptablesLockPluginInit(char *args) {
 	if(canRegisterPlugin(IPTABLES)) {
 		DEBUG_WRAP(DebugMessage(DEBUG_INIT,"Output: Linking IptablesLockPlugin functions to call lists...\n"));
 		AddFuncToOutputList(handleIptablesLock, OUTPUT_TYPE__ALERT, args);
+		turnOnProperFirewall();
 	}
 }
 
