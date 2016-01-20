@@ -1,7 +1,7 @@
-#include "barnyard2.h"
-#include "spo_mgr_utils.h"
+#include "spo_lock_utils.h"
 #include "unified2.h"
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -37,8 +37,8 @@ FirewallData *prepareFirewallData(Packet *p, void *event) {
 	return data;
 }
 
-char* format(const char *format,...) {
-    char buf[STD_BUF+1];
+char* format(const char *format, ...) {
+    char *buf = (char *)SnortAlloc(STD_BUF + 1);
     va_list ap;
 
     va_start(ap, format);
@@ -47,6 +47,35 @@ char* format(const char *format,...) {
     return buf;
 }
 
+void turnOnProperFirewall() {
+
+	system("service firewalld stop");
+	system("service iptables stop");
+	system("service nftables stop");
+}
+
+char* getFirewallName(FirewallType firewallType) {
+	switch(firewallType) {
+		case FIREWALLD : return "firewalld";
+		case IPTABLES : return "iptables";
+		case NFTABLES : return "nftables";
+		default : return NULL;
+	}
+}
+
+bool canRegisterPlugin(FirewallType firewallType) {
+	return barnyard2_conf->firewall_type == firewallType
+			&& barnyard2_conf->firewall_lock_num_events > 0;
+}
+
+/*
+ * najpierw trzeba uruchomić odpowiedniego firewalla, a inne wyłączyć
+ * firewall uruchamiany jest zawsze, ale sam proces tylko wtedy gdy spełnia pewne warunki
+ * pierwszy warunek to jeśli nie ma żadnych eventów to nie ma co wykonywać operacji, czy rejestrować plugin
+ * jeśli nie ma podanych occurances to typ jest brany jako immediate
+ * jeśli czas jest niepodany to mode jest brany jako permanent
+ * pamiętać żę plugin musi się tak samo nazywać jak plik z początkiem spo_*
+ */
 bool isAdverseAction(FirewallData *data) {
 	int i = 0;
 	while(i < barnyard2_conf->firewall_lock_num_events) {
@@ -59,8 +88,9 @@ bool isAdverseAction(FirewallData *data) {
 	return false;
 }
 
-void printParameters() {
 
+
+void printParameters() {
     if(barnyard2_conf->firewall_type == FIREWALLD) {
         printf("Firewall type : FIREWALLD \n");
     } else if(barnyard2_conf->firewall_type == IPTABLES) {
@@ -90,9 +120,7 @@ void printParameters() {
     printf("Firewall lock time : %d \n", barnyard2_conf->firewall_lock_time);
     printf("Firewall lock occurances : %d \n", barnyard2_conf->firewall_lock_occurances);
     printEvents();
-
 }
-
 
 void printEvents() {
     int i;

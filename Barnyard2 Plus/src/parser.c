@@ -2820,9 +2820,7 @@ void ConfigFirewallLockOccurances(Barnyard2Config *bc, char *args) {
     bc->firewall_lock_occurances = lock_occurances;
 }
 
-/* For master thesis
- jeśli nie podamy eventów to nie ma po co wykonywać jakiekolwiek operacje, czy rejestrować plugin
- * */
+/* For master thesis */
 void ConfigFirewallLockEvents(Barnyard2Config *bc, char *args) {
     if( (bc == NULL) || (args == NULL)) return;
 

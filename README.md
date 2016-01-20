@@ -177,9 +177,9 @@ config waldo_file: /tmp/waldo
 config process_new_records_only
 
 output alert_fast: stdout
-output mgr_firewalld: stdout
-output mgr_iptables: stdout
-output mgr_nftables: stdout
+output firewalld_lock_plugin: stdout
+output iptables_lock_plugin: stdout
+output nftables_lock_plugin: stdout
 ```
 
 Bez zmiany natomiast pozostawiamy konfigurację domyślną dotyczącą położenia plików konfiguracyjnych snorta.

@@ -127,6 +127,14 @@ Command line:
         -d <dir>   Spool files from <dir>
         -n         Only process new events
         -w <file>  Enable bookmarking using <file>
+    
+    Additional Options For Master Thesis:
+        -j <type>   Select firewall type [firewalld|iptables|nftables] 
+        -k <type>   Select firewall lock type [immediate|occurances_dependent] 
+        -K <number> Set after how many occurances of event appears lock 
+        -z <type>   Select firewall lock mode [temporary|permanent] 
+        -Z <time>   Set lock time in seconds
+                
 
     Batch Processing Mode Options:
         -o         Enable batch processing mode

@@ -1,6 +1,8 @@
 #ifndef __SPO_MGR_UTILS_H__
 #define __SPO_MGR_UTILS_H__
 
+#include "barnyard2.h"
+
 typedef struct _FirewallData {
 	uint16_t dport;
 	char* protocol;
@@ -13,6 +15,9 @@ char* format(const char *format,...);
 bool isAdverseAction(FirewallData *data);
 void printParameters();
 void printEvents();
+
+bool canRegisterPlugin(FirewallType firewallType);
+char* getFirewallName(FirewallType firewallType);
 
 #endif
 
