@@ -10,15 +10,18 @@ typedef struct _FirewallData {
     uint32_t generator_id;
 } FirewallData;
 
-FirewallData *prepareFirewallData(Packet *p, void *event);
-char* format(const char *format,...);
-bool isAdverseAction(FirewallData *data);
-void printParameters();
-void printEvents();
+FirewallData *getFirewallData(Packet *p, void *event);
 
 void turnOnProperFirewall();
-bool canRegisterPlugin(FirewallType firewallType);
+bool canHandlePlugin(FirewallType firewallType);
+bool canHandleEvent(FirewallData *data);
+bool isExceededOccurancesNumber(FirewallLockEvent *firewallLockEvent);
+int getTimeOfLock();
+
 char* getFirewallName(FirewallType firewallType);
+char* format(const char *format,...);
+void printParameters();
+void printEvents();
 
 #endif
 

@@ -9,43 +9,26 @@
 static char* PROTOCOL_TCP = "tcp";
 static char* PROTOCOL_UDP = "udp";
 
-FirewallData *prepareFirewallData(Packet *p, void *event) {
-	FirewallData *data = NULL;
+FirewallData *prepareFirewallData(void *event, uint16_t port, char* protocol);
 
-	if (p == NULL || p->frag_flag || !IPH_IS_VALID(p)) {
-		return NULL;
-	}
+FirewallData *getFirewallData(Packet *p, void *event) {
+	if (p == NULL || p->frag_flag || !IPH_IS_VALID(p)) return NULL;
 
 	switch (GET_IPH_PROTO(p)) {
-		case IPPROTO_TCP:
-			data = (FirewallData *)SnortAlloc(sizeof(FirewallData));
-			data->dport  = ntohs(p->tcph->th_dport);
-			data->protocol = PROTOCOL_TCP;
-			data->signature_id = ntohl(((Unified2EventCommon *)event)->signature_id);
-			data->generator_id = ntohl(((Unified2EventCommon *)event)->generator_id);
-			break;
-		case IPPROTO_UDP:
-			data = (FirewallData *)SnortAlloc(sizeof(FirewallData));
-			data->dport  = ntohs(p->udph->uh_dport);
-			data->protocol = PROTOCOL_UDP;
-			break;
-		case IPPROTO_ICMP:
-			break;
-		default:
-			break;
+		case IPPROTO_TCP: return prepareFirewallData(event, p->tcph->th_dport, PROTOCOL_TCP);
+		case IPPROTO_UDP: return prepareFirewallData(event, p->udph->uh_dport, PROTOCOL_UDP);
+		case IPPROTO_ICMP: return NULL;
+		default: return NULL;
 	}
-
-	return data;
 }
 
-char* format(const char *format, ...) {
-    char *buf = (char *)SnortAlloc(STD_BUF + 1);
-    va_list ap;
-
-    va_start(ap, format);
-    vsnprintf(buf, STD_BUF, format, ap);
-    va_end(ap);
-    return buf;
+FirewallData *prepareFirewallData(void *event, uint16_t port, char* protocol) {
+	FirewallData *data = (FirewallData *)SnortAlloc(sizeof(FirewallData));
+	data->signature_id = ntohl(((Unified2EventCommon *)event)->signature_id);
+	data->generator_id = ntohl(((Unified2EventCommon *)event)->generator_id);
+	data->dport  = ntohs(port);
+	data->protocol = protocol;
+	return data;
 }
 
 void turnOnProperFirewall() {
@@ -61,6 +44,41 @@ void turnOnProperFirewall() {
 	}
 }
 
+bool canHandleEvent(FirewallData *data) {
+	int i;
+	for(i = 0; i < barnyard2_conf->firewall_lock_num_events; i++) {
+		if(firewall_events[i].generator_id == data->generator_id && firewall_events[i].signature_id == data->signature_id) {
+			switch(barnyard2_conf->firewall_lock_type) {
+				case OCCURANCES_DEPENDENT : return isExceededOccurancesNumber(&firewall_events[i]);
+				case IMMEDIATE : return true;
+				default : return false;
+			}
+		}
+	}
+	return false;
+}
+
+bool isExceededOccurancesNumber(FirewallLockEvent *firewallLockEvent) {
+	firewallLockEvent->occurences++;
+	if(firewallLockEvent->occurences == barnyard2_conf->firewall_lock_occurances) {
+		firewallLockEvent->occurences %= barnyard2_conf->firewall_lock_occurances;
+		return true;
+	}
+	return false;
+}
+
+bool canHandlePlugin(FirewallType firewallType) {
+	return (barnyard2_conf->firewall_type == firewallType)
+			&& (barnyard2_conf->firewall_lock_num_events > 0);
+}
+
+int getTimeOfLock() {
+	if(barnyard2_conf->firewall_lock_mode == TEMPORARY) {
+		return barnyard2_conf->firewall_lock_time;
+	}
+	return 0;
+}
+
 char* getFirewallName(FirewallType firewallType) {
 	switch(firewallType) {
 		case FIREWALLD : return "firewalld";
@@ -70,32 +88,15 @@ char* getFirewallName(FirewallType firewallType) {
 	}
 }
 
-bool canRegisterPlugin(FirewallType firewallType) {
-	return barnyard2_conf->firewall_type == firewallType
-			&& barnyard2_conf->firewall_lock_num_events > 0;
+char* format(const char *format, ...) {
+    char *buf = (char *)SnortAlloc(STD_BUF + 1);
+    va_list ap;
+
+    va_start(ap, format);
+    vsnprintf(buf, STD_BUF, format, ap);
+    va_end(ap);
+    return buf;
 }
-
-/*
- * najpierw trzeba uruchomić odpowiedniego firewalla, a inne wyłączyć
- * firewall uruchamiany jest zawsze, ale sam proces tylko wtedy gdy spełnia pewne warunki
- * pierwszy warunek to jeśli nie ma żadnych eventów to nie ma co wykonywać operacji, czy rejestrować plugin
- * jeśli nie ma podanych occurances to typ jest brany jako immediate
- * jeśli czas jest niepodany to mode jest brany jako permanent
- * pamiętać żę plugin musi się tak samo nazywać jak plik z początkiem spo_*
- */
-bool isAdverseAction(FirewallData *data) {
-	int i = 0;
-	while(i < barnyard2_conf->firewall_lock_num_events) {
-		char *event = data->generator_id + ":" + data->signature_id;
-		if(barnyard2_conf->firewall_lock_events[i] == event) {
-			return true;
-		}
-		i++;
-	}
-	return false;
-}
-
-
 
 void printParameters() {
     if(barnyard2_conf->firewall_type == FIREWALLD) {
