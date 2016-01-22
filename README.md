@@ -305,4 +305,10 @@ $ sudo netstat -lptu
 $ sudo netstat -tulpn
 ```
 
-## TODO
+## Konfiguracja Nftables
+git clone git://git.netfilter.org/nftables
+cd nftables
+./autogen.sh
+./configure
+make
+make install
