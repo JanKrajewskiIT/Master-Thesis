@@ -306,9 +306,40 @@ $ sudo netstat -tulpn
 ```
 
 ## Konfiguracja Nftables
-git clone git://git.netfilter.org/nftables
-cd nftables
+Bibliotekę libmnl w wersji 1.0.3 należy pobrać z oficjalnej strony http://www.netfilter.org
+```sh
+git clone git://git.netfilter.org/libmnl
+cd libmnl
 ./autogen.sh
 ./configure
 make
 make install
+```
+
+```sh
+export LIBMNL_LIBS=/usr/local/lib/libmnl.so
+export LIBMNL_CFLAGS=/usr/include
+```
+
+```sh
+git clone git://git.netfilter.org/libnftnl
+cd libnftnl
+./autogen.sh
+./configure
+make
+make install
+```
+
+```sh
+export LIBNFTNL_LIBS=/usr/local/lib/libnftnl.so
+export LIBNFTNL_CFLAGS=/usr/include
+```
+
+```sh
+git clone git://git.netfilter.org/nftables
+./autogen.sh
+./configure --with-mini-gmp --without-cli
+make
+make install
+```
+
