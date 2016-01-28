@@ -9,7 +9,6 @@
 # processname: barnyard2
 # config: /etc/sysconfig/barnyard2
 # config: /etc/snort/barnyard.conf
-# pidfile: /var/lock/subsys/barnyard2.pid
 
 source /etc/rc.d/init.d/functions
 source /etc/sysconfig/network
@@ -32,13 +31,20 @@ desc="Snort Output Processor"
 
 start() {
 	echo -n $"Starting $desc ($prog): "
-	for INT in $INTERFACES; do
-		PIDFILE="/var/lock/subsys/barnyard2-$INT.pid"
-		ARCHIVEDIR="$SNORTDIR/$INT/archive"
-		WALDO_FILE="$SNORTDIR/$INT/barnyard2.waldo"
-		BARNYARD_OPTS="-D -c $CONF -d $SNORTDIR/${INT} -w $WALDO_FILE -l $SNORTDIR/${INT} -a $ARCHIVEDIR -f $LOG_FILE -X $PIDFILE $EXTRA_ARGS"
+	
+    	if [ `echo $INTERFACES|wc -w` -gt 2 ]; then
+		for INT in $INTERFACES; do
+			ARCHIVEDIR="$SNORTDIR/$INT/archive"
+			WALDO_FILE="$SNORTDIR/$INT/barnyard2.waldo"
+			BARNYARD_OPTS="-D -c $CONF -d $SNORTDIR/${INT} -w $WALDO_FILE -l $SNORTDIR/${INT} -a $ARCHIVEDIR -f $LOG_FILE $EXTRA_ARGS"
+			daemon $prog $BARNYARD_OPTS
+		done
+	else 
+		ARCHIVEDIR="$SNORTDIR/archive"
+		WALDO_FILE="$SNORTDIR/barnyard2.waldo"
+		BARNYARD_OPTS="-D -c $CONF -d $SNORTDIR -w $WALDO_FILE -l $SNORTDIR -a $ARCHIVEDIR -f $LOG_FILE $EXTRA_ARGS"
 		daemon $prog $BARNYARD_OPTS
-	done
+	fi
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog
@@ -99,3 +105,4 @@ case "$1" in
 esac
 
 exit $RETVAL
+
