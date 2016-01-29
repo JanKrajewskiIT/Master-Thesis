@@ -2799,11 +2799,9 @@ void ConfigFirewallLockTime(Barnyard2Config *bc, char *args) {
     if ((args == NULL) || (bc == NULL)) return;
 
     int lock_time = atoi(args);
-
-    if ((errno == ERANGE) || (lock_time < 0) || (lock_time & ~FILEACCESSBITS)) {
+    if ((errno == ERANGE) || (lock_time < 0)) {
         ParseError("Bad firewall lock time: %s", args);
     }
-
     bc->firewall_lock_time = lock_time;
 }
 
@@ -2812,11 +2810,9 @@ void ConfigFirewallLockOccurances(Barnyard2Config *bc, char *args) {
     if ((args == NULL) || (bc == NULL)) return;
 
     int lock_occurances = atoi(args);
-
-    if ((errno == ERANGE) || (lock_occurances < 0) || (lock_occurances & ~FILEACCESSBITS)) {
+    if ((errno == ERANGE) || (lock_occurances < 0)) {
         ParseError("Bad firewall lock occurances: %s", args);
     }
-
     bc->firewall_lock_occurances = lock_occurances;
 }
 
