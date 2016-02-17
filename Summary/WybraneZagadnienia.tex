@@ -1,0 +1,110 @@
+\chapter{Wybrane zagadnienia} \label{rozdz.zagadnienia} 
+
+Jak wspomniano w powyższych rozważaniach tematyka pracy mieści się w zakresie kilku pojęć z dziedziny bezpieczeństwa. Ważna grupa zagadnień dotyczy systemów wykrywania ingerencji. Istotne jest przedstawienie terminów w odpowiedniej kolejności, od abstrakcyjnych do bardziej wyspecjalizowanych.
+
+\section{Pojęcie ingerencji}
+
+Na wstępie warto pochylić sie nad pojęciem ingerencji. Jest to każda nieautoryzowana aktywność w sieci komputerowej. Przykładem może być atak lub włamanie, przy czym nie zachodzi tutaj implikacja. Wykrywanie ingerencji stanowi zbiór technik i metod wykorzystywanych do przechwytywania podejrzanego zachowania. Niezbędne jest do tego pełne zrozumienie mechanizmu działania poszczególnych aktywności. W efekcie uzyskane informacje za pomocą metod detekcji zdarzeń mogą posłużyć do ochrony systemu. 
+
+Włamanie jest specjalnym przypadkiem ingerencji i odnosi się do sytuacji, w której osoba atakująca uzyskuje nieuprawniony dostęp do zasobów systemu. Może przejawiać się na wiele sposobów. W efekcie zazwyczaj przynosi korzyści osobie atakującej i straty właścicielowi systemu. Tego typu zagrożenia wynikają najczęściej z globalnego charakteru oraz dużego skomplikowania środowiska sieci komputerowych. Przygotowanie skutecznego systemu zabezpieczeń możliwe jest jedynie dzięki znajomości możliwych scenariuszy włamań. Ogólny przypadek zawiera kilka kroków, a mianowicie :
+\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item zbadanie możliwości przeprowadzanego ataku,
+\item rozpoznanie celu poprzez skanowanie portów dla sprawdzenia listy usług przez niego wystawianych,
+\item przeprowadzenie ataku za pomocą programu {\em exploit} wykorzystującego słabości oprogramowania środowiska,
+\item przejęcie kontroli nad procesami systemu,
+\item instalacja aplikacji umożliwiających uzyskanie zdalnego dostępu do zasobów systemu.
+\end{itemize}
+
+Przedstawiony scenariusz dotyczy włamania bezpośredniego do systemu. Można również dokonać tego pośrednio przez agenta (np. aplikację) przesłanego do sieci wewnętrznej. Odbywa się to zwykle za pomocą usług sieciowych takich jak poczta elektroniczna. Dobrym przykładem takiej aktywności jest wysłanie kodu JavaScript lub ActiveX na źle skonfigurowaną, nieaktualną wersję klienta pocztowego. Może on zostać wywołany w systemie gospodarza. Odpowiednio przeprowadzone włamanie umożliwia intruzowi :
+\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item dostęp do wartościowych danych, a w konsekwencji ich modyfikację, kradzież lub zniszczenie,
+\item instalację narzędzi udostępniających zdalny dostęp, takich jak {\em trojan} lub {\em backdoor},
+\item kontynuowanie ataków na inne strefy bezpieczeństwa (np. sieć wewnętrzną) lub kolejne systemy,
+\item pozostawienie informacji o włamaniu w celu rozgłosu {\em(ang. fingerprint)},
+\item wykonywanie innych działań na serwerze hosta.
+\end{itemize}
+
+\section{Testy penetracyjne}
+
+Test penetracyjny to każdy proces, którego celem jest dokonanie praktycznej oceny stanu bezpieczeństwa danego systemu informatycznego. Zazwyczaj ma charakter kontrolowanego ataku przeprowadzonego w celu sprawdzenia działania mechanizmów obronnych środowiska. W przeciwieństwie do włamania udzielana jest zgoda atakowanej strony dla przeprowadzenia testu penetracyjnego. Wynikiem powinien być raport przedstawiający znalezione słabości oraz rekomandacje podnoszące bezpieczeństwo systemu. Słabością mogą być tutaj luki systemu operacyjnego, wady aplikacji i usług, niewłaściwa konfiguracja oraz nieodpowiednie działania użytkownika końcowego. 
+
+Istnieje kilka metodyk przeprowadzania testów penetracyjnych. Opisują one zabezpieczenia prawne, procedury działania i czynności jakie należy wykonywać. Testy przeprowadzać można na dwa sposoby a mianowicie przy uzyskaniu minimalnej wiedzy {\em(ang. black box)} bądź pełnej wiedzy {\em(ang. crystal box)}. W pierwszym przypadku zespół testujący nie ma dostępu do danych technicznych, otrzymuje tylko podstawowe informacje (np. adres serwisu) i~stara się odzwierciedlić zachowanie potencjalnego włamywacza. Jest to bardzo czasochłonne podejście. Drugi sposób daje możliwość posiadania pełnej dokumentacji projektowej, kodu źródłowego, konfiguracji urządzeń itp. Narzuca to pewien kierunek działania co może spowodować pominięcie istotnych nieudokumentowanych przypadków. Metodyka działań zależy od efektu końcowego jaki chce uzystać zleceniodawca testów. 
+
+Do znalezienia i wykorzystania luki systemu często stosuje się małe i wysoce wyspecjalizowane programy komputerowe {\em(ang. exploit)}, których zadaniem jest uzyskanie dostępu do systemu komputerowego. W większości przypadków dostarczają one pewnego rodzaju ładunek {\em(ang. payload)} do elementu docelowego. Ładunek ten przeważnie ma formę oprogramowania pomagającego w realizacji wspomnianego celu. Projekt {\em Metasploit} oferuje największą publiczną bazę wysokiej jakości {\em exploit'ów} oraz moduły i zasoby niezbędne do przeprowadzania testów penetracyjnych.
+
+Najczęściej stosowaną techiniką w atakach z wykorzystaniem {\em exploit'ów} jest przepełnienie bufora {\em(ang. buffer overflow)}. W ten sposób podejmowana jest próba nadpisania specyficznych sekcji pamięci urządzenia znajdującego się w sieci poprzez zastąpienie zwykłych danych zestawem poleceń, które zostaną wykonane jako część ataku. Z uwagi na rodzaje buforów wyróżnia się dwie metody, a mianowicie rozbijanie stosu (ang. stack smashing) oraz rozbijanie sterty (ang. heap smashing).
+\newline \newline
+[ Poprawić i opisać kilka popularnych ataków ]
+
+\iffalse
+Na szczęście nie każda ingerencja kończy się włamaniem. Przykładem na to jest popularny atak typu DoS (ang. Denial of Service), którego celem jest uniemożliwienie poprawnego korzystania z systemu. 
+
+Drugim popularnym typem ataków są działania mające na celu uniemożliwienie prawidłowego działania atakowanego systemu (ang. Denial of Service, DoS).
+Trzy podstawowe rodzaje takich ataków to: podawanie fałszywych danych prowadzące do błędnego działania systemu (np.
+„zatruwanie” tablic ARP, ang. ARP Poisoning), podawanie nieprawidłowych, nie uwzględnionych w standardach danych
+skutkujące np. zawieszeniem się procesu obsługującego te dane (np. Ping Of Death) oraz zalewanie (ang. flooding)
+systemu danymi prawidłowymi w ilości uniemożliwiającej właściwą pracę systemu (np. SYN flood – otwieranie olbrzymiej
+ilości połączeń TCP, często z wykorzystaniem dużej liczby systemów­zombie). */
+\fi
+
+\section{Intrusion Detection System}
+
+Tak jak już wcześniej wspomniano IDS {\em(ang. Intrusion Detection System)} jest programem, urządzeniem bądź ich kombinacją służącą do wykrywania podejrzanych zachowań w systemie informatycznym. Każda implementacja może posiadać inne funkcje w zależności komponentów. W swoim działaniu IDS może używać technik opartych o podpisy lub anomalie, jak również obu rozwiązań jednocześnie.  
+ 
+Sygnatura jest wzorem wyszukiwanym w pakiecie danych. Służy do wykrywania wielu typów ataków. W zależności od charakteru ataku może być obecna w różnych częściach pakietu (np. nagłówku IP, nagłówku warstwy transportowej i aplikacji). Każda ingerencja wymaga stworzenia nowej sygnatury, dlatego ich liczba stale rośnie. Anomalię stanowi dowolna akcja odstająca od przyjętego modelu zachowań w środowisku sieciowym. W niektórych przypadkach metody oparte o anomalie daję lepsze wyniki. 
+
+Za pomocą stworzonych reguł i sygnatur system IDS jest w stanie znaleźć podejrzane zachowanie, a w konsekwencji wygenerować alarm oraz zapisać informację o wykrytej aktywności. Poprzez alarm należy rozumieć każdorazowe powiadomienie użytkownika o zainstniałej sytuacji. Przejawiać się ono może w formie wiadomości poczty elektronicznej, informacji w konsoli administracyjnej, okna aplikacji itd. Wzmianka może zostać również odnotowana w bazie danych w celu późniejszej weryfikacji przez ekspertów. Informacje o wykrytym zagrożeniu mogą także zostać zapisane w dzienniku zdarzeń za pomocą tekstu lub w formacie binarnym. Rejestrowanie danych w plikach binarnych jest dużo szybsze, a do przeglądania takich zasobów stworzone zostały specjalne narzędzia {\em(np. tcpdump)}.
+
+Jednym z najczęściej wykorzystywanych pojęć w niniejszym konspekcie jest system informatyczny. W rozumieniu tematyki bezpieczeństwa jest to zazwyczaj system operacyjny, serwer usług badź infrastruktura sieciowa. Pojawia się także określenie systemu jako czujnika {\em(ang. sensor)}, wskazujące na maszynę, na której uruchomiony został detektor zdarzeń. 
+
+\section{Rodzaje systemów IDS}
+
+W ramach realizacji projetu dyplomowego zastosowany został system wykrywania ingerencji o charakterze sieciowym (ang. Network-based IDS). Mechanizm takiego podejścia polega na analizie ruchu w mediach sieciowych i dopasowaniu pakietów danych do bazy sygnatur. Charakterystyke ogólną przybliżono w poprzednich rozdziałach.
+
+Nie jest to jednak jedyna stosowana architektura tego typu narzędzi. Definicja ingerencji nie wskazuje jednoznacznie jej natury sieciowej. Można rozpatrywać to pojęcie lokalnie w ramach systemu operacyjnego, który zazwyczaj posiada zintegrowane środowisko HIDS (ang. Host-based IDS). Narzędzia tego typu instalowane są zazwyczaj w postaci agenta, który analizuje zapisy zdarzeń systemowych i aplikacji w celu wykrycia nieprawidłowości. Przykładowym wpisem takiego rejestru może być informacja o nieprawidłowym uwierzytelnieniu uzytkownika. Kontroli podlegają także zdarzenia pochodzące z lokalnych interfejsów sieciowych. Niektóre rozwiązania HIDS podejmują się także monitorowania ingerencji w system plików poprzez sumy kontrolne bądź kontrolę wywołań systemowych jądra. 
+
+Często zachodzi konieczność zestawiania obu przytoczonych rozwiązań w architekturę hybrydową IDS. W wielu przypadkach możliwe jest wyprodukowanie w ten sposób solidnego narzędzia rozwiązującego wiele problemów bezpieczeństwa. Nie zawsze jednak się to udaje, a samo zadanie odpowiedniego połączenia cech obu systemów jest niezwykle trudne. Dochodzi zazwyczaj do duplikacji niektórych funkcji. Wady jednego rozwiązania zacierają czasem zalety drugiego. Środowiska tego typu są najczęściej rozproszone, co wpływa na ich uciążliwą obsługę. Mimo tego istnieją przykłady dobrze zaimplementowanych produktów tej kategorii np. {\em Prelude IDS}. Systemy hybrydowe mają scentralizowaną budowę. Odpowiednio rozlokowane moduły odpowiadające za realizację usług NIDS i HIDS komunikują się z elementem głównym w celu wymiany informacji.
+
+W ramach systemów NIDS istnieją jeszcze dwie kategorie rozwiązań, których schemat działania oparty jest o protokół warstwy aplikacji. Technologie te dokonują nasłuchu i analizy ruchu sieciowego m. in. poprzez dekodowanie i interpretację transmitowanych danych. Narzucają poprawne wykorzystanie protokołu (np. HTTP, TCP) w celu zapobiegania włamaniom. Oferują dużo większe możliwości niż inne wspomniane w tej sekcji mechanizmy ale kosztem zasobów obliczeniowych. Są to rozwiązania :
+\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item PIDS {\em(ang. Protocol-based IDS)} - instalowane zazwyczaj na serwerze HTTP, służące do monitorowania strumienia danych wejściowych. 
+\item APIDS {\em(ang. Application and Protocol-based IDS)} - analizujące dodatkowo semantykę przesyłanych danych, umieszczane często pomiędzy serwerem HTTP i systemem baz danych w celu kontrolowania wysyłanych zapytań SQL.
+\end{itemize}
+
+Należy wspomnieć również o systemach wykrywania fizycznych ingerencji, które dotyczą głównie ochrony sprzętu. Mogą to być najróżniejsze czujniki informujące o próbie rozłączenia urządzeń. 
+
+\section{Typy zapór sieciowych}
+
+Ogólna charakterystyka zapór sieciowych {\em(ang. firewall)} została opisania w rozdziale drugim. Warto przypomnieć, że stanowią one grupę narzędzi, które egzekwując politykę bezpieczeństwa przepuszczają lub blokują pewien ruch sieciowy. Umieszczne są zazwyczaj na obwodzie sieci. Istnieją trzy typy zapór, choć w literaturze tej dziedziny można znaleźć również inne miary podziału.
+
+Firewall pierwszej generacji to filtr pakietów analizujący ruch na podstawie nagłówka pakietu. Sprawdza przede wszystkim adres IP i port źródłowy oraz docelowy, a także rodzaj protokołu sieciowego. Działa bardzo szybko. Umieszczany jest zazwyczaj w ruterach łączących nasz system z siecią w postaci listy kontroli dostępu {\em(ACL, ang. access control list)}. Tego typu lista składa się na reguły zdefiniowane dla każdego protokołu, zakresu adresów oraz kierunku przepływu, które określają czy pakiet powinien zostać zablokowany. 
+
+Stanowe filtrowanie pakietów jest rozbudowaną formą poprzedniego typu firewall'a. Pracuje na tych samych warstwach modelu OSI, a mianowicie sieciowej i transportowej.  Dodatkowo śledzi informacje o stanie połączenia i wprowadza je do tabeli stanów. Wpisy obejmują źródłowy i docelowy adres IP, interfejsy sieciowe, źródłowy i docelowy port, protokół, numery ACK i SEQ itp. Schemat działania opisywanego mechanizmu opiera się na wstępnym sprawdzeniu, czy przechodzący przez zaporę pakiet neleży do ustalonego połączenia. Pozytywna weryfikacja nakazuje przepuszczenie pakietu. W przeciwnym wypadku zostaje poddany w dalszej kolejności regułom ACL. Zwiększa to wydajność działania systemu. 
+
+Ostatni a zarazem najbardziej wyszukany typ zapory realizowany jest za pomocą pośrednika {\em(ang. application proxy)}. Posiada cechy obu pozostałych typów, a także obejmuje w swoim działaniu procesy klienta i serwera dla każdego wspieranego przez nich protokołu. W ramach działania mechanizmu ustanawiane są oddzielne sesje: jedna od klienta do zapory, a druga od zapory do serwera. Tym sposobem powstaje pośrednik kontrolujący i przetwarzający wszystkie pakiety w ramach danego protokołu. Wydajność takiego rozwiązania jest niska. 
+\newline \newline
+[ Poprawić i dokończyć ]
+
+\section{Zasady projektowania zabezpieczeń}
+
+Stworzenie solidnego systemu zabezpieczeń wymaga jego wcześniejszego zaprojektowania. Aby uzyskać skuteczny, efektywny i skalowalny produkt należy przeprowadzić specyfikację wymagań bezpieczeństwa i ustalić :
+\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item zasoby systemu informatycznego narażone na ataki, które powinny zostać objęte ochroną,
+\item istniejące zagrożenia oraz źródło ich pochodzenia,
+\item reakcję zabezpieczeń na ataki (np. alarmowanie, blokowanie niebezpiecznych zdarzeń),
+\item miejsce ulokowania mechanizmów bezpieczeństwa.
+\end{itemize}
+
+Istnieje kilka zasad bezpieczeństwa, które należy uwzględnić podczas projektowania zabezpieczeń. Należą do nich :
+\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item {\em Compartmentalization of Information} - zasoby systemu informatycznego powinny znajdować się w różnych strefach bezpieczeństwa, w zależności od poziomu ich wrażliwości na zagrożenia; udostępniane powinny być tylko dane niezbędne do prawidłowego funkcjonowania systemu,
+\item {\em Defence-in-Depth} - istnieje wiele niezależnych warstw zabezpieczeń, na których opiera się ochrona wrażliwych danych; warstwy te znajdują się w różnych miejscach systemu i ubezpieczają się wzajemnie,
+\item {\em The Principle of Least Privilege} - użytkownicy i administratorzy systemu informatycznego posiadają minimalne uprawnienia i dostęp do informacji w zakresie pozwalającym im na poprawne wykonywanie swoich obowiązków,
+\item {\em Weekest link in the chain} - poziom bezpieczeństwa szacowany jest względem najsłabiej zabezpieczonego elementu.
+\end{itemize}
+
+Realizacja tych zasad wymaga między innymi odpowieniego zaprojektowania stref bezpieczeństwa oraz ustawień kontroli dostępu. Ważna jest także poprawna lokalizacja zabezpieczeń. Powinny znajdować się one na drodze łączącej źródło zagrożenia z chronionymi zasobami. Należy w pierwszej kolejności zapewnić ochronę najbardziej wartościowym danym, nie zapominając o pozostałych. Istnieje bowiem technika atakowania {\em Island Hopping Attack} polegająca na próbie zdobycia nieautoryzowanego dostępu do słabo zabezpieczonych systemów w celu penetracji kolejnych, lepiej ochranianych elementów. 
+\newline \newline
+[ Opisać topologię sieci (IDS + Firewall) ]
+
+\clearpage

@@ -1,0 +1,334 @@
+\chapter{Konfiguracja środowiska} \label{rozdz.konfiguracja} 
+\section{Maszyny wirtualne} 
+
+Do~realizacji założeń pracy magisterskiej niezbęde były odpowiednio przygotowane środowiska pracy. Za~pomocą narzędzia {\em VirtualBox} stworzono dwie maszyny wirtualne, których konfiguracja opisana została poniżej. Oprogramowanie wykorzystane w~projekcie jest w~pełni darmowe, udostępnione w~większości przypadków na~licencji {\em GNU General Public License}. 
+
+\subsection{Pierwsza maszyna}
+
+Pierwsze środowisko posiada zainstalowany system {\em CentOS~7 Linux}, a~z~nim pakiet narzędzi służących między innymi do~ochrony przed włamaniami czy~analizy ruchu w~sieci. Elementy te stanowią trzon nowej implementacji, przedstawionej w~dalszych rozdziałach. W~ustawieniach dla~opisywanej maszyny wirtualnej dodane zostały dwa interfejsy sieciowe :
+
+\vspace{3mm} \noindent
+\begin{tabular}{lp{120mm}}
+enp0s3 & uzyskany poprzez ustawienie adaptera sieciowega {\em NAT}, niezbędny do~bezpośredniego dostępu do~sieci globalnej, \\
+enp0s8 & stworzony z opcją {\em Host-Only Adapter}, umożliwiający wykonywanie operacji pomiędzy środowiskami w~sieci lokalnej. \\
+\end{tabular}
+\newline
+
+\begin{lstlisting}[language=bash, frame=single, caption=Wyświetlenie adresów IP przypisanych do interfejsów sieciowych.]
+$ (ifconfig enp0s3 & ifconfig enp0s8) | grep 'inet '
+enp0s3: inet 10.0.3.15  netmask 255.255.255.0  broadcast 10.0.3.255
+enp0s8: inet 192.168.56.103 netmask 255.255.255.0 broadcast 192.168.56.255
+\end{lstlisting}
+
+\subsection{Druga maszyna}
+Na~drugiej maszynie został zainstalowany system {\em Kali Linux} posiadający gotowy zestaw narzędzi do~przeprowadzania testów penetracyjnych serwera oraz~audytu bezpieczeństwa. Pozwolił on na~dużą wygodę pracy w~zakresie danego projektu poprzez dostarczenie gotowych, prekonfigurowanych rozwiązań takich jak~{\em Metasploit} czy~{\em Armitage}. Posiada wszystkie wymagane elementy wykorzystywane do~analizy działania pierwszego przedstawionego środowiska pracy. 
+
+\section{Snort}
+
+Snort jest jedną z~najpopularniejszych realizacji sieciowego systememu wykrywania ingerencji. Jako bardzo precyzyjne narzędzie dostarcza szeroki zakres mechanizmów detekcji, pozwalających na~monitorowanie i~analizowanie ruchu w~sieci w~czasie rzeczywistym. Zbudowany został w~oparciu o~interfejs {\em libpcap}, szeroko stosowany w analizatorach TCP/IP oraz~{\em sniffer'ach}. Potrafi między innymi dokonywać analizy strumieni pakietów, przeszukiwać i~dopasowywać szkodliwe treści, a~także wykrywać wiele anomalii i~metod ataków. Zgromadzone informacje wysyła do~dziennika zdarzeń bądź na~wyjście standardowe systemu operacyjnego. Do przeprowadzenia operacji wykrywania ingerencji wykorzystuje zdefiniowane reguły (ang. {\em rules}). 
+
+\subsection{Instalacja}
+Snort nie jest niestety wbudowanym składnikiem systemu operacyjnego CentOS~7. Nie wchodzi także w~skład podstawowych repozytoriów oprogramowania tej dystrybucji, ale~odpowiednie pakiety RPM (Red Hat Package Manager) można pobrać z~oficjalnej strony projektu {\em http:\textbackslash\textbackslash snort.org}. Do~poprawnego działania mechanizmu niezbędna była instalacja bibliotek {\em daq} i {\em snort} odpowiednio.
+
+\begin{lstlisting}[language=bash, frame=single, caption=Instalacja pakietów {\em daq} i {\em snort}.]
+$ rpm -ihv daq-2.0.5-1.centos7.x86_64.rpm 
+$ rpm -ihv snort-2.9.7.3-1.centos7.x86_64.rpm
+\end{lstlisting}
+
+\subsection{Konfiguracja}
+W~trakcie procesu instalacji stworzony został skrypt startowy {\em snortd} w~katalogu {\em /etc/rc.d/init.d}. Uruchomienie usługi przebiegło bez~zastrzeżeń, jednak program Snort zakończył działanie. Aby~się~o~tym przekonać należało sprawdzić status usługi. Przyczynę błędu i~braki konfiguracyjne określono stosując moduł testujący dostarczony przez~oprogramowanie. W~wyniku przeprowadzonej analizy uzyskano informację o~braku definicji niezbędnych plików reguł wraz z~ich~położeniem. 
+
+\begin{lstlisting}[language=bash, frame=single, caption=Uruchomienie i sprawdzenie stanu usługi {\em snortd}.]
+$ systemctl start snortd
+$ systemctl status snortd
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash, frame=single, caption=Sprawdzenie poprawności konfiguracji narzędzia Snort.]
+$ snort -c /etc/snort/snort.conf -T
+\end{lstlisting}
+
+Reguły należą do~niezależnej dystrybucji, a~bezpłatne zestawy można pobrać ze~wspomnianej strony internetowej. Licencja nie zezwala na ich rozpowszechnianie, ale~daje dowolność przy~wdrożeniach. Istnieje kilka klas reguł odpowiadających zestawom zawartym w~dostarczonym archiwum. Należą do~nich między innymi reguły:
+\vspace{-1mm}
+\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item klasyczne (katalog {\em rules}) - standardowe reguły przygotowane przez producenta oprogramowania,
+\item społecznościowe (katalog {\em so\_rules}) - opracowywane przez społeczność użytkowników, dostarczane razem z kodem źródłowym dodatkowych modułów dynamicznych,
+\item preprocesorów (katalog {\em preproc\_rules}) - odwołujące się do mechanizmów poszczególnych preprocesorów, zapewniające kontrolę nad generowanymi zdarzeniami,
+\item dynamiczne - dynamicznie ładowane biblioteki binarne będące rozszerzeniem standardowego silnika reguł,
+\item reputacji - reguły nowego preprocesora {\em reputation}, pozwalającego na blokowanie bądź przepuszczanie ruchu pochodzącego z zarejestrowanych adresów IP.
+\end{itemize}
+
+Niezwykle istotne było odpowiednie ulokowanie tych~zestawów. Minimalna konfiguracja wymagała umieszczenia reguł standardowych w~katalogu {\em /etc/snort/rules}. Wykorzystano również inne~kolekcje dostępne w~pakiecie. Opisane zmiany nie zostały wykryte automatycznie, dlatego należało dodać odpowiednie wpisy do pliku konfiguracyjnego {\em /etc/snort/snort.conf}.
+
+\begin{lstlisting}[language=bash, frame=single, caption=Odpowiednie ulokowanie reguł oprogramowania Snort.]
+$ tar -xf snortrules-snapshot-2973.tar.gz
+$ mv rules/* /etc/snort/rules
+$ mv preproc_rules /etc/snort/rules
+$ mv so_rules /etc/snort/rules
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash, frame=single, caption=Niezbędna konfiguracja reguł w pliku {\em snort.conf}.]
+var RULE_PATH /etc/snort/rules
+var SO_RULE_PATH /etc/snort/rules/so_rules
+var PREPROC_RULE_PATH /etc/snort/rules/preproc_rules
+
+include $PREPROC_RULE_PATH/preprocessor.rules
+include $PREPROC_RULE_PATH/decoder.rules
+include $PREPROC_RULE_PATH/sensitivedata.rules
+\end{lstlisting}
+
+Producenci nie dostarczają aktualnie reguł dynamicznych i~reputacji dla~dystrybucji CentOS~7. Należało je zatem dezaktywować poprzez odpowiednie ustawienia.
+
+\begin{lstlisting}[language=bash, frame=single, caption=Wyłączenie nieobsługiwanych reguł w pliku {\em snort.conf}]
+# dynamicdetection directory /usr/local/lib/snort_dynamicrules
+
+# Reputation preprocessor. For more information see README.reputation
+# preprocessor reputation: \
+#   memcap 500, \
+#   priority whitelist, \
+#   nested_ip inner, \
+#   whitelist $WHITE_LIST_PATH/white_list.rules, \
+#   blacklist $BLACK_LIST_PATH/black_list.rules 
+\end{lstlisting}
+
+Aby możliwe było tworzenie tekstowych zapisów zarejestrowanych anomalii, umieszczono plik {\em sid-msg.map} w~katalogu z~konfiguracją oprogramowania Snort. Zawiera on niezbędne informacje o~generowanych przez~reguły zdarzeniach. 
+
+\begin{lstlisting}[language=bash, frame=single, caption=Umieszczenie pliku {\em sid-msg.map} w~katalogu z~konfiguracją.]
+$ cp etc/sid-msg.map /etc/snort
+\end{lstlisting}
+
+Po wykonaniu wszystkich opisanych czynności usługa {\em snortd} została uruchomiona ponownie za pomocą narzędzia {\em systemctl}. 
+
+\subsection{Skrypt usługi}
+Wspomniana we wcześniejszych sekcjach usługa {\em snortd} pozwala na uruchomienie programu Snort w trybie {\em daemona}. Do jej prawidłowego działania konieczne było odpowiednie ustawienie dyrektyw w pliku {\em /etc/sysconfig/snort}. Konfiguracja ta ma pierwszeństwo nad konfiguracją zawartą w pliku {\em /etc/snort/snort.conf}.
+
+Ustawienia domyślne w dużej mierze pokrywają się z wymaganiami środowiska, w którym zainstalowany został Snort. Dodatkowo ustalono interfejs sieciowy {\em enp0s3}, na którym prowadzony jest nasłuch podczas przeprowadzania testów penetracyjnych. Do poprawnego zapisywania zdarzeń w formacie {\em unified} należało dezaktywować opcje {\em alertmode} oraz {\em binary\_log}. Taka zależność pozwala uzyskać odpowiedniego formatu dane dla analizatora Barnyard2. Aktywna dyrektywa {\em alertmode} zezwala jedynie na zapis ostrzeżeń do plików standardowych, bez względu na wybrany tryb. Wartość 1 ustawiona dla pola {\em binary\_log} świadczy o możliwym generowaniu zapisów w postaci binarnej. 
+
+\begin{lstlisting}[language=bash, frame=single, caption=Zmiany konfiguracyjne w pliku {\em snort}.]
+INTERFACE=enp0s3
+# ALERTMODE=fast
+BINARY_LOG=0
+\end{lstlisting}
+
+Poprzez ponowne uruchomienie usługi zatwierdzono wprowadzone zmiany. Standardowe ustawienia wymuszają także wywołanie skryptu {\em snortd} podczas startu systemu operacyjnego. Można się o tym przekonać sprawdzając listę działających procesów systemowych.
+
+\begin{lstlisting}[language=bash, frame=single, caption=Wyświetlenie uruchomionego procesu oprogramowania Snort.]
+$ ps aux | grep /usr/sbin/snort
+/usr/sbin/snort -d -D -i enp0s3 -u snort -g snort 
+	-c /etc/snort/snort.conf -l /var/log/snort
+\end{lstlisting}
+
+Uzyskana w~odpowiedzi informacja ukazuje sposób uruchamiania oprogramowania Snort przez usługę {\em snortd}. Wartości wejściowe dla~każdej opcji pochodzą z~pliku {\em /etc/sysconfig/snort}. Zbiór wykorzystanych parametrów wystarcza do~osiągnięcia odpowiedniej instancji. Są~to opcje:
+
+\vspace{3mm} \noindent 
+\begin{tabular}{lp{100mm}}
+-D & uruchomienie procesu w~trybie {\em daemona} \\
+-d & flaga wskazująca na~konieczność umieszczenia w~dzienniku zdarzeń danych transportowanych przez pakiet oraz~informacji z~warstwy łącza danych \\
+-i interfejs & wskazanie interfejsu, dla~którego przeprowadzana jest detekcja zdarzeń\\ [-7mm]
+\begin{tabular}{@{}l@{}} \\ -u użytkownik \\ -g grupa \end{tabular} & zmiana użytkownika systemowego i~grupy, a~co~za~tym idzie określenie na~jakich uprawnieniach zostanie uruchomiona usługa \\
+-c plik & podanie położenia pliku konfiguracyjnego\\ 
+-l katalog & naprowadzenie na~katalog, w którym mają być składowane zapisy zdarzeń \\
+\end{tabular}
+\newline
+
+\section{Barnyard2}
+
+Barnyard2 jest darmowym narzędziem pomocniczym oprogramowania Snort. Stworzony został do~przeglądania plików binarnych w~formacie {\em unified2} generowanych przez wspomniany system wykrywania ingerencji. Oddelegowane zostały do~niego operacje przetwarzania danych. Może zostać uruchomiony w~trybie wsadowym lub~ciągłym. W~pierwszym przypadku po~przetworzeniu całego wskazanego pliku kończy działanie. W~trybie ciągłym wykorzystuje nowo dodane informacje w~plikach pasujących do podanego wzorca.
+
+\subsection{Instalacja}
+
+Kod źródłowy dostępny jest w~publicznym repozytorium {\em GitHub'a}. Daje to~sposobność dokonywania modyfikacji systemu do~własnych potrzeb. Instalację należało przeprowadzić wykorzystując źródła z~ostatniej stabilnej wersji. 
+
+\begin{lstlisting}[language=bash, frame=single, caption=Pobranie kodu źródłowego oprogramowania Barnyard2.]
+$ git clone https://github.com/firnsy/barnyard2/tree/stable
+\end{lstlisting}
+
+Do~bezawaryjnej kompilacji analizatora Barnyard2 niezbędne były pakiety {\em libtool}, {\em libpcap-devel} oraz~{\em libdnet-devel}. Moduł składowania informacji w~bazie danych wymagał również posiadania biblioteki {\em postgresql-devel}. Opis instalacji i~konfiguracji środowiska PostgreSQL przedstawiony został w~dalszej części pracy. Na~wstępie należało uruchomić skrypt {\em autogen.sh} z~pobranego archiwum, a~następnie zainicjować konfigurację uwzględniającą obsługę bazy danych. Ostatecznie wystarczyło zbudować i~zainstalować oprogramowanie.
+
+\begin{lstlisting}[language=bash, frame=single, caption=Instalacja programu Barnyard2 i niezbędnych narzędzi.]
+$ yum install libtool libpcap-devel libdnet-devel postgresql-devel
+$ ./autogen.sh
+$ ./configure --with-postgresql
+$ make
+$ make install
+\end{lstlisting}
+
+\subsection{Konfiguracja}
+
+Program Barnyard2 został ulokowany w~katalogu {\em /usr/local/bin} wraz z~plikiem konfiguracyjnym {\em barnyard2.conf}. Konieczne było przeprowadzenie kilku zmian w~ustawieniach tego narzędzia. Uruchomienie w~trybie ciągłym wymagało wskazania położenia plików zapisu zdarzeń generowanych przez oprogramowanie Snort. Ustawiona flaga {\em process\_new\_records\_only} ogranicza zbiór przetwarzanych informacji do~tych opisujących nowe zdarzenia. Miejsce zakończenia przetwarzania danych odnotowywane jest w~specjalnym rejestrze {\em waldo}, dlatego konieczne było wyznaczenie jego położenia. Wskazany został także interfejs sieciowy {\em enp0s3}, na którym prowadzony jest nasłuch. Dyrektywa {\em alert\_fast} z~wartością stdout pozwala na~wyświetlanie wyników analizy na~ekranie, przy jednoczesnej rezygnacji z~ich~zapisu w~pliku tekstowym.
+
+\begin{lstlisting}[language=bash, frame=single, caption=Zmiany konfiguracyjne w pliku {\em barnyard2.conf}.]
+config logdir: /var/log/snort
+config interface: enp0s3
+config waldo_file: /var/log/snort/barnyard2.waldo
+config process_new_records_only
+output alert_fast: stdout
+\end{lstlisting} 
+
+\subsection{Przygotowanie bazy danych}
+
+Poprawnie przygotowany program Barnyard2 posiada moduły zarządzające komunikacją z~bazą danych PostgreSQL. Główną zaletą współpracy tych narzędzi jest możliwość gromadzenia przetworzonych danych w~ściśle określonej strukturze. W~tym celu należało przygotować system baz danych i~dokonać odpowiedniej konfiguracji całego środowiska. Zainstalowane zostały niezbędne pakiety dostępne w~standardowych repozytoriach systemu operacyjnego CentOS~7. Następnie uruchomiono usługę {\em postgresql} i dokonano jednorazowego utworzenia nowego klastra bazodanowego.
+
+\begin{lstlisting}[language=bash, frame=single, caption=Instalacja i inicjacja bazy danych PostgreSQL.]
+$ yum install postgresql postgresql-devel postgresql-server 
+$ yum install postgresql-contrib postgresql-libs postgresql-client
+$ systemctl enable postgresql
+$ postgresql-setup initdb
+$ systemctl start postgresql
+\end{lstlisting}
+
+Za~pomocą powłoki administracyjnej {\em psql}, korzystając z konta użytkownika systemowego {\em postgres}, utworzono nową bazę danych {\em snort\_logs} oraz~powiązanego z~nią użytkownika {\em snort\_user}. W celu posłużenia się tymi jednostkami należało odnotować zmiany w pliku konfiguracyjnym {\em /var/lib/pgsql/data/pg\_hba.conf}.
+
+\begin{lstlisting}[language=sql, frame=single, caption=Utworzenie nowej bazy danych i użytkownika.]
+$ su - postgres
+$ psql
+> create database snort_logs;
+> create user snort_user password 'barnyard2016';
+> grant all on database snort_logs to snort_user;
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash, frame=single, caption=Zmiany konfiguracyjne w pliku {\em pg\_hba.conf}.]
+#host	all			all			127.0.0.1/32	ident
+host	snort_logs	snort_user	127.0.0.1/32	password
+\end{lstlisting}
+
+Każda zmiana konfiguracji PostgreSQL wymaga jej przeładowania. Ustalony schemat bazy danych można zaimportować z dostarczonego przez producenta pliku, zaraz po zalogowaniu się na konto nowo utworzonego użytkownika bazodanowego. Plik ten znajduje się w katalogu instalacyjnym programu Barnyard2. 
+\vspace{3mm}
+\begin{lstlisting}[language=bash, frame=single]$ 
+$ systemctl reload postgresql
+$ psql -U snort_user -h 127.0.0.1 snort_logs
+> \i /usr/src/barnyard2-stable/schemas/create_postgresql
+\end{lstlisting}
+
+Zapis wyników analizatora możliwy jest dopiero po umieszczeniu odpowiedniej informacji w pliku konfiguracyjnym /usr/local/bin/barnyard2.conf. W opisie dyrektywy "database" powinny znaleźć się przede wszystkim informacje niezbędne do nawiązania połączenia z bazą danych.
+\vspace{3mm}
+\begin{lstlisting}[language=bash, frame=single] 
+output database: alert, postgresql, host=127.0.0.1 port=5432 user=snort_user 
+	password=barnyard2016 dbname=snort_logs sensor_name=snort1
+\end{lstlisting}
+
+
+\subsection{Skrypt usługi}
+Uruchomienie programu Barnyard2 w obecnym stanie systemu wiąże się z koniecznością wykonywania kilku manualnych operacji. W pewnym momencie może stać się to uciążliwe. Oczekujemy od środowiska, iż będzie automatycznie reagować na zachodzące zdarzenia. Konieczne jest przygotowanie skryptu zarządzającego usługą. Występuje tutaj analogia do konfiguracji aplikacji Snort, jednak z wyższym nakładem pracy.
+
+Pakiet instalacyjny Barnyard2 posiada katalog rpm, w którym składowane są moduły niezbędne do przygotowania usługi. Skrypt barnyard2 należy skopiować do katalogu /etc/rc.d/init.d/ i nadać mu uprawnienia do wywołania. Będzie on uruchamiany przy starcie systemu. Ważne jest także ulokowanie pliku konfiguracyjnego w folderze /etc/sysconfig/. Usługa wymaga aktywacji w systemie. 
+
+\vspace{3mm}
+\begin{lstlisting}[language=bash, frame=single] 
+$ cp rpm/barnyard2 /etc/init.d/
+$ chmod +x /etc/rc.d/init.d/barnyard2
+$ cp rpm/barnyard2.config /etc/sysconfig/barnyard2
+$ chkconfig --add barnyard2
+\end{lstlisting}
+
+Ustawienia dyrektyw należy ustosunkować do przygotowanego środowiska. Dostarczone w ten sposób informacje wskazują między innymi na miejsce składowania logów zdarzeń, konfigurację oprogramowania Barnyard2, czy interfejs, na którym odbywa się nasłuch.
+
+\vspace{3mm}
+\begin{lstlisting}[language=bash, frame=single] 
+LOG_FILE="merged.log"
+SNORTDIR="/var/log/snort"
+INTERFACES="enp0s3"
+CONF=/etc/snort/barnyard2.conf
+\end{lstlisting}
+
+Aktualna implementacja skyptu barnyard2 zawiera pewne nieścisłości w stosunku do tej prezentowanej przez snortd. Nie posiada bowiem rozdzielenia działania na przypadki, gdy określony jest jeden interfejs sieciowy i gdy tych elementów jest kilka. Działanie środowiska przygotowanego do realizacji założeń pracy magisterskiej oparte jest o jeden taki interfejs. Kreuje to niezgodności między specyfiką skryptu, a konfiguracją ścieżek do plików i katalogów poszczególnych narzędzi. Należało zatem dodać własny przepływ sterowania oraz strukturę uruchamiającą program Barnyard2.
+
+\vspace{3mm}
+\begin{lstlisting}[language=bash, frame=single] 
+if [ `echo $INTERFACES|wc -w` -gt 2 ]; then
+	...	#aktualna implementacja
+else
+	ARCHIVEDIR="$SNORTDIR/archive"
+	WALDO_FILE="$SNORTDIR/barnyard2.waldo"
+	BARNYARD_OPTS="-D -c $CONF -d $SNORTDIR -w $WALDO_FILE 
+		-l $SNORTDIR -a $ARCHIVEDIR -f $LOG_FILE $EXTRA_ARGS"
+	daemon $prog $BARNYARD_OPTS
+fi
+\end{lstlisting}
+
+Do poprawnego działania usługi należy jeszcze utworzyć skróty do konfiguracji i pliku wykonywalnego aplikacji Barnyard2. Skrypt narzuca również utworzenie katalogu archive. 
+\vspace{3mm}
+\begin{lstlisting}[language=bash, frame=single] 
+$ ln -s /usr/local/etc/barnyard2.conf /etc/snort/barnyard2.conf
+$ ln -s /usr/local/bin/barnyard2 /usr/bin/
+$ mkdir /var/log/snort/eth0/archive/
+\end{lstlisting}
+
+W trakcie ponownego uruchomienia mechanizmu dokonuje się załadowanie wprowadzonych zmian. O poprawności jego działania dowiadujemy się z analizy działających w systemie procesów. 
+
+\vspace{3mm}
+\begin{lstlisting}[language=bash, frame=single]
+$ ps aux | grep barnyard2
+barnyard2 -D -c /etc/snort/barnyard2.conf -d /var/log/snort 
+	-w /var/log/snort/barnyard2.waldo -l /var/log/snort 
+	-a /var/log/snort/archive -f merged.log
+\end{lstlisting}
+
+Odpowiedź dostarcza nam informacji w jaki sposób usługa realizuje oprogramowanie Barnyard2. Za wartości wejściowe posłużyły argumenty dyrektyw z pliku /etc/sysconfig/barnyard2. Poprawne uruchomienie narzędzia jest możliwe dzięki wykorzystaniu opcji :
+
+\vspace{3mm}
+\noindent 
+\begin{tabular}{lp{100mm}}
+-D & uruchomienie procesu w trybie daemona\\
+-c plik & podanie położenia pliku konfiguracyjnego\\
+-d katalog & naprowadzenie na katalog, w którym składowane są zapisy zdarzeń w formacie unified\\
+-w plik & określenie położenia pliku waldo, będącego rejestrem informacji o ostatnio przetworzonych zdarzeniach\\
+-l katalog & bezpośrednia ścieżka do katalogu, w którym mają zostać zapisane wyniki analiz \\
+-a katalog & miejsce archiwizacji prztworzonych plików \\
+-f wzorzec & ustalenie prefix'u nazw plików zdarzeń \\
+\end{tabular}
+\newline
+
+\section{Instalacja usług}
+Przeprowadzanie testów penetracyjnych na serwerze, polega na wykonywaniu kontrolowanych ataków w celu oceny bieżącego stanu bezpieczeństwa systemu. Do tego zadania wybrane zostało narzędzie Metasploit, zawarte w pakietach standardowych systemu operacyjnego Kali Linux. Oprogramowanie to posiada imponującą bazę przygotowanych przez producenta ataków, często zwanych exploit'ami. Aby możliwe było przeprowadzenie takich analiz, testowany serwer musi udostępnić porty protokołów tcp, bądź udp. Przez udostępnienie należy rozumieć otworzenie portu, po to by na przykład wystawić zewnętrznie usługę realizowaną przez serwer.
+
+W tym celu na maszynie wirtualnej z systemem CentOS 7 zainstalowano kilka dodatkowych narzędzi. Poprzez polecenie nmap można sprawdzić na jakich portach one nasłuchują i jakie oferują usługi.
+
+\vspace{3mm}
+\begin{lstlisting}[language=bash, frame=single] 
+$ nmap -v 192.168.56.103
+...
+PORT     STATE SERVICE
+1/tcp    open  tcpmux
+7/tcp    open  echo
+20/tcp   open  ftp-data
+21/tcp   open  ftp
+22/tcp   open  ssh
+23/tcp   open  telnet
+25/tcp   open  smtp
+37/tcp   open  time
+42/tcp   open  nameserver
+43/tcp   open  whois
+49/tcp   open  tacacs
+70/tcp   open  gopher
+79/tcp   open  finger
+80/tcp   open  http
+109/tcp  open  pop2
+110/tcp  open  pop3
+119/tcp  open  nntp
+139/tcp  open  netbios-ssn
+143/tcp  open  imap
+161/tcp  open  snmp
+179/tcp  open  bgp
+389/tcp  open  ldap
+444/tcp  open  snpp
+445/tcp  open  microsoft-ds
+458/tcp  open  appleqtc
+563/tcp  open  snews
+631/tcp  open  ipp
+1080/tcp open  socks
+5432/tcp open  postgresql
+6667/tcp open  irc
+8080/tcp open  http-proxy
+8090/tcp open  unknown
+...
+\end{lstlisting}
+
+Do przeprowadzenia ataku można wykorzystać program Armitage zainstalowany w systemie Kali Linux. Jest to graficzny moduł zarządzania narzędziem Metasploit. Jedną z jego funkcji jest zautomatyzowane wyszukiwanie docelowych host'ów, na których przeprowadzane są testy penetracyjne. W tym celu należy skorzystać z opcji "Quick Scan" w menu głównym aplikacji i wpisać docelowy adres IP o wartości 192.168.56.103. Jak już wcześniej wspomniano jest to adres przypisany do interfejsu sieciowego enp0s3 znajdującego się na maszynie wirtualnej z systemem CentOS 7.
+\newline
+
+\vspace{3mm}
+\includegraphics{QuickScan.png}
+
+Uzyskaną w ten sposób konfigurację można uzupełnić o skonkretyzowaną dla danego systemu listę exploit'ów. Służy do tego opcja "Attacks -> Find attacks". W ten sposób przygotowane zaplecze posłuży nam do sprawdzania poprawności działania całego środowiska i zaimplementowanych mechanizmów.
+
+\clearpage

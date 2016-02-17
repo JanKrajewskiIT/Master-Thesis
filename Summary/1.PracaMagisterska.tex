@@ -1,0 +1,81 @@
+\documentclass[12pt]{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{sidecap}
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{txfonts}
+\usepackage{fontspec}
+\newfontfamily\Consolas{Consolas}
+
+\usepackage[polish]{babel}
+
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{indentfirst}
+
+\renewcommand{\chaptername}{Rozdział}
+\renewcommand{\contentsname}{Spis treści}
+\renewcommand{\figurename}{Rys.}
+\renewcommand{\tablename}{Tab.}
+\renewcommand{\listfigurename}{Spis rysunków}
+\renewcommand{\listtablename}{Spis tabel}
+\renewcommand{\lstlistlistingname}{Spis listingów}
+\renewcommand{\bibname}{Bibliografia}
+
+\setlength{\textwidth}{14cm}
+\setlength{\textheight}{22cm}
+\linespread{1,5}
+
+\newcommand\Small{\fontsize{9}{10}\selectfont}
+\definecolor{commandcolor}{RGB}{167,29,93}
+\definecolor{identifiercolor}{RGB}{24,54,145}
+
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  % breaklines=true,
+  tabsize=4,
+  frame=L,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\Small\Consolas,
+  keywordstyle=\bfseries\color{commandcolor},
+  commentstyle=\itshape\color{gray},
+  identifierstyle=\color{identifiercolor},
+  stringstyle=\color{orange},
+}
+
+\lstset{escapechar=@,style=customc}
+
+\begin{document}
+\pagenumbering{gobble}
+
+%\include{StronaTytulowa}
+
+\tableofcontents
+\clearpage
+
+\pagestyle{headings}
+\pagenumbering{arabic}
+
+%\include{Wstep}
+%\include{MetodyPrzeciwdziałaniaIngerencjom}
+%\include{WybraneZagadnienia}
+%\include{CharakterystykaWybranychTechnologii}
+\include{KonfiguracjaSrodowiska}
+%\include{OpisRozwiazania}
+%\include{AnalizaPoprawnosciRozwiazania}
+%\include{Podsumowanie}
+%\include{Bibliografia}
+
+\addcontentsline{toc}{chapter}{Spis ilustracji} 
+\listoffigures
+
+%\addcontentsline{toc}{chapter}{Spis tabel} 
+%\listoftables
+
+\addcontentsline{toc}{chapter}{Spis listingów} 
+\lstlistoflistings
+
+\end{document}

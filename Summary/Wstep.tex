@@ -1,0 +1,47 @@
+\chapter{Wstęp} \label{rozdz.wstep} % {\em min 70 stron }
+
+Poprzez postęp komputeryzacji i informatyzacji stajemy się niewolnikami automatyzacji każdego aspektu naszego życia. Dziś niewiele osób zdaje sobie sprawę z rozmiaru ingerencji tych składników w codzienne czynności, a także wynikające z tego faktu konsekwencje. W informatyce tak samo jak w naturze, każda akcja generuje ryzyko, które należy niwelować w sposób jak najbardziej efektywny.
+
+W chwili odkrycia możliwości łączenia wielu urządzeń w ramach sieci, powstała konieczność uruchomienia mechanizmów ochrony danych i sprzętu. Do dziś tworzone są i rozwijane metody zapobiegania potencjalnie niebezpiecznym ingerencjom w trosce o bezpieczeństwo prywatnych zasobów firm i użytkowników domowych. Nieodpowiednio przygotowanie zaplecze do działania w takim środowisku może doprowadzić do szkodliwych następstw. Niestety każdy system posiada luki, w wyniku czego wciąż trwają badania nad detekcją nowych zagrożeń i rozwojem narzędzi. Niewiele jest także rozwiązań działających kompleksowo, dlatego dla uzyskania gwarancji bezpieczeństwa należy skorzystać z kilku jednocześnie. I tutaj pojawia się problem natury wydajnościowej. Każde bowiem dodatkowe zabezpieczenie obciąża w znacznym stopniu chroniony system. Należy dokonać analizy ryzyka, przygotować politykę bezpieczeństwa, oszacować koszty istniejących technologii i~wybrać odpowiednie dla konkretnego przypadku. 
+
+\section{Problematyka i zakres pracy}
+
+Niniejsza praca magisterska dotyczy zakresu sieci komputerowych i inżynierii oprogramowania, a dokładnie aspektów integracji i rozwoju narzędzi służących bezpieczeństwu systemów. Poświęcona została w dużej mierze tematyce testów penetracyjnych, przeciwdziałaniu ingerencjom sieciowym oraz wstecznej inżynierii oprogramowania wiodących na rynku producentów. Głównym przedmiotem projektu jest wykorzystanie znanych technologi ze wskazanej dziedziny, a także ich odpowiednia modyfikacja w celu uzyskania swoistego środowiska reaktywnie przeciwdziałającego zagrożeniom. 
+
+Podejmowanie takiej tematyki w czasach powszechnego dostępu do internetu jest bardzo ważne. Niemal każdy z nas posiada urządzenie korzystające z zasobów sieciowych, które może stać się obiektem ataków. Skutki włamania nie zawsze są widoczne od razu, a zakres wyrządzonych szkód może być niewielki lub mieć poważne następstwa. W rezultacie możliwa jest utrata ważnych danych, uszkodzenie działania serwera, pojawienie się szkodliwego oprogramowania oraz poniesienie strat finansowych. Najbardziej narażone na ataki są instytucje publiczne i korporacje. 
+
+Przed takimi działaniami należy się bronić, uzupełniając mechanizm systemu informatycznego zestawem zabezpieczeń. Rynek urządzeń i oprogramowania oferuje różnorodne rozwiązania. Do najpopularniejszych i prężnie rozwijanych należą systemy wykrywania i zapobiegania ingerencjom. Nowoczesne platformy zaopatrywane są często w najnowsze osiągnięcia z zakresu zapór sieciowych. Niewiele jest jednak rozwiązań wykorzystujących informacje generowane przez mechanizmy detekcji zdarzeń w celu zarządzania nowoczesnymi regułami filtrowania pakietów. 
+
+Produkt niniejszej pracy magisterskiej jest swoistą realizacją takiego założenia. Rozszerza funkcjonalność znanego systemu wykrywania ingerencji, tak by w reakcji na detekcję podejrzanych zachowań dokonywał konfiguracji nowoczesnych zapór sieciowych. Na rynku oprogramowania istnieje niewiele takich narzędzi. Są to zazwyczaj wydzielone instancje wspierające stare technologie, często nie posiadające wsparcia technicznego. Dało to sposobność stworzenia unikalnego rozwiązania zaszytego w rzeczywistych procesach, które do swojego działania nie potrzebuje dodatkowych zasobów sprzętowych i kanałów komunikacji, co wpływa na efektywność działania. Wykorzystywane reguły filtrowania pakietów są zazwyczaj integralną częścią współczesnych systemów operacyjnych. Warto zatem użyć w pełni płynących z tego możliwości. Zaowocuje to poprawą bezpieczeństwa, wzrostem wydajności działania systemu, przy rezygnacji z dodatkowych mechanizmów. Warto wspomnieć, iż wszystkie elementy realizujące założenia pracy są w pełni darmowe.
+
+Przedstawione dzieło nie podejmuje trudu charakterystyki sposobów przeprowadzania ataków na systemy zewnętrzne. Ogranicza się do przygotowania i analizy działania bariery ochronnej dla potencjalnej ofiary takiego zachowania.
+
+\section{Cele pracy}
+
+Zasadniczymi celami prezentowanej pracy są :
+\vspace{-1mm} \begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item przeprowadzenie studiów literaturowych z zakresu zagadnień bezpieczeństwa, a przede wszystkim sposobów przeciwdziałania zagrożeniom w~sieci,
+\item określenie stopnia unikalności elementów rozwiązania oraz wskazanie dowodów na jego oryginalność,
+\item przedstawienie charakaterystyki narzędzi wyselekcjonowanych do realizacji tematyki pracy oraz uzasadnienie dokonanego wyboru,  
+\item skonfigurowanie wszystkich elementów systemu bezpieczeństwa oraz dobór odpowiednich technologii programistycznych,
+\item implementacja własnego rozwiązania reaktywnie przeciwdziałającego ingerencjom sieciowym,
+\item analiza niezawodności i poprawności działania przygotowanego narzędzia.
+\end{itemize}
+
+Niniejsza praca ma zarówno charakter badawczy jak i użytkowy. Przed przystąpieniem do części praktycznej istotne było przeprowadzenie analizy istniejących rozwiązań z dziedziny bezpieczeństwa. Należało przy tym zwrócić szczególną uwagę na problemy nieautoryzowanej ingerencji w systemy informatyczne oraz metodyki przeciwdziałania takim zachowaniom. Przybliżone zostały architektury efektywnie realizujące przyjęte założenia oraz konsekwencje jakie z tego wynikają. Przygotowany konspekt zawiera charakterystykę sposobu wykorzystania wybranych narzędzi do uzyskania oryginalnego rozwiązania, a także wskazanie na zakres jego unikalności. 
+
+Kolejnym celem pracy było zaprezentowanie w sposób zwięzły poszczególnych narzędzi wykorzystanych w części praktycznej, a także punktów komunikacji wszystkich tych elementów. Niezwykle ważne było określenie ról wspomnianych produktów w działaniu całego środowiska oraz ich wpływu na efekt końcowy. Informacje te stanowią wprowadzenie do przeprowadzenia odpowiedniej konfiguracji oprogramowania poczynając od maszyn wirtualnych z systemami operacyjnymi, poprzez wybrany system IDS (ang. Intrusion Detection Systemu), aplikacje pomocnicze i bazy danych, do środowiska programistycznego. 
+
+Opracowana w ramach pracy dyplomowej implementacja nowego modułu stanowi swoiste uzupełnienie wiodących technologi. W konsekwencji konspekt opisuje drogę do rozwiązania poruszonych zagadnień, przedstawia sposoby osiągnięcia zamierzonego celu z dokładnym i rzeczowym opisem. Zadaniem zaimplementowanego produktu było dostarczenie :
+\vspace{-1mm} \begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item możliwości prostej konfiguracji opartej o istniejące ustawienia,
+\item modułu sprawdzenia poprawność działania składników systemu, 
+\item mechanizmu zarządzania zewnetrznymi usługami,
+\item implementacji instrumentu przeciwdziałania zagrożeniom poprzez wykorzystanie dostępnych zasobów informacji i narzędzi.
+\end{itemize}
+
+Główny cel pracy stanowiło uzyskanie niezawodnego mechanizmu w dziedzinie bezpieczeństwa. Aby ocenić czy przygotowany projekt spełnia założenia, potrzebna była gruntowna analiza jego działania, składająca się przede wszystkim z testów penetracyjnych przeprowadzonych na badanym środowisku.
+
+\section{Układ pracy}
+
+Po zapoznaniu się z problematyką pracy oraz określeniu najważniejszych celów w bieżącym rozdziale, należy przejść do sedna. Część druga konspektu przedstawia analizę istniejących rozwiązań na rynku oprogramowania w dziedzinie bezpieczeństwa. Na podstawie tych danych pomaga oszacować stopień unikalności wypracowanego produnktu. Rozdział trzeci zawiera pojęciowy opis problemu zapobiegania ingerencjom sieciowym. W rozdziale czwartym zawarto charakterystykę technologii wybranych do realizacji głównych założeń pracy, a także wskazano metodykę działań w celu uzyskania odpowiedneij konfiguracji tych narzędzi. Część piąta wypracowania ukazuje implementację własnego rozwiązania wewnątrz istniejącego narzędzia wiodącego w tej dziedzinie producenta. Przedostatni punkt konspektu pochyla się nad analizą działania uzyskanego w części praktycznej systemu reaktywnie przeciwdziałającemu ingerencjom. Finalny rozdział poświęcony został podsumowaniu pracy oraz zaprezentowaniu wyników przemyśleń i dokonanych badań.

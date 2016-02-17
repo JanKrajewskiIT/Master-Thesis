@@ -1,0 +1,134 @@
+\chapter{Opis rozwiązania} \label{rozdz.rozwiazanie} 
+Rozdział ten poświęcony jest kwintesencji całej pracy, a mianowicie wstecznej inżynierii aplikacji Barnyard2. Umożliwił to fakt, iż producenci tego narzędzia udostępnili publicznie kod źródłowy w repozytorium GitHub'a. Sam projekt napisany został w języku C. Do budowania aplikacji wykorzystano standardowy dla systemów uniksowych kompilator GCC. Jako, iż cała struktura aplikacji została już poprawnie przygotowana, swoja uwagę w większości można było poświęcić rozwijaniu nowych modułów.
+
+Założeniem powstałego produktu było uzyskanie mechanizmu operującego istniejącym w systemie firewall'em. Chodziło głównie o to by blokować ustalone zdarzenia o określonej specyfikacji. Utworzone zostały także zadania uruchamiające, czy też zamykające odpowiednie zestawy usług. Całość uwarunkowano nowo powstałymi dyrektywami. To tylko część możliwości przygotowanego projektu.
+
+\section{Dyrektywy}
+Niezbędnym elementem działania nowej funkcjonalności było utworzenie dodatkowej konfiguracji. Wiązało się to z uwzględnieniem kolejnych dyrektyw w pliku konfiguracyjnyn barnyard2.conf, a także w liście parametrów wywołania usług. 
+
+\vspace{3mm}
+\begin{lstlisting}[language=bash, frame=single]
+config firewall_type: firewalld
+config firewall_lock_type: immediate
+config firewall_lock_mode: temporary
+config firewall_lock_time: 10
+config firewall_lock_occurances: 10
+config firewall_lock_events: 129:15, 129:14
+\end{lstlisting}
+
+Poniższe zestawienie przedstawia opcje uruchomienia usługi wraz z opisem wartości jakie mogą przyjąć. Warto spomnieć o tym, że liczby GID i SID definiowane przez oprogramowanie Snort służą do opisu reguł. Reguły te generują odpowiednie zdarzenia. 
+
+\vspace{3mm}
+\noindent 
+\begin{tabular}{lp{101mm}}
+firewall\_type & określa typ firewall'a jaki zostanie wykorzystany do~blokowania odpowiednich anomalii; do tego zadania przygotowane zostały narzędzia firewalld i~iptables; uruchomiona usługa może skorzystać tylko z jednego rozwiązania  \\
+firewall\_lock\_type & zapewnia dwa typy realizacji blokady, a mianowicie zaraz po identyfikacji zdarzenia (immediate), bądź po określonej liczbie jego wystąpień (occurances\_dependent) \\
+firewall\_lock\_mode & wskazuje na tryb blokady i opisuje, czy ma być ona stała i natychmiastowa (permanent), czy też ograniczona w czasie (temporary) \\
+firewall\_lock\_time & liczba sekund działania blokady utworzonej w trybie "temporary" \\
+firewall\_lock\_occurances & ilość wystąpień anomalii, dla której następuje blokada typu "occurances\_dependent" \\
+firewall\_lock\_events & lista charakteryzująca zdarzenia jakie uważane są przez system za niebezpieczne; każdy element opisany jest prze parę liczb GID i SID oddzielonych dwukropkiem \\
+\end{tabular}
+\newline
+
+Do prawidłowego działania oprogramowania, wspomniany zestaw dyrekryw należało uwzględzić w kodzie. Co więcej, bez tej wzmianki nie jest możliwe poprawne zbudowanie analizatora. Całość została zaimplementowana w module parsowania pliku konfiguracyjnego parser.c. 
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=1, lastline=7]{ConfigCode.c}
+
+Zdefiniowane stałe posłużyły do uzupełnienia listy opcji konfiguracyjnych. Oprócz samej nazwy dyrektywy należało ustalić również :  
+\vspace{-1mm} \begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item czy wymagane jest podanie argumentu,
+\item czy wartość może zostać oszacowana więcej niż raz,
+\item metodę parsowania i mapowania argumentu do odpowiedniej zmiennej programu. 
+\end{itemize}
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=8, lastline=17]{ConfigCode.c}
+
+[ Powinny się tutaj jeszcze pojawić parametry uruchomienia programu w liście poleceń ]
+
+Dla każdego przypadku potrzebne było zdefiniowanie metody parsowania i mapowania argumentu podanego w pliku barnyard.conf na wartość zmiennej. W tym celu dopisano odpowiednie elementy do struktury nazwanej Barnyard2Config. 
+
+Zasada działania mechanizmów przypisywania typów wygląda analogicznie w trzech przypadkach. Można to zauważyć przy dyrektywach posiadających stały i określony zbiór wartości, które mogą osiągnąć. Utworzono dla nich typy wyliczeniowe o etykietach FirewallType, FirewallLockType oraz FirewallLockMode. 
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=19, lastline=34]{ConfigCode.c}
+
+W przypadku podania określenia spoza puli metoda wysyła informację o wystąpieniu błędu parsowania. Brak skonkretyzowanej wartości skutkuje przypisaniem domyślnej, wcześniej ustalonej.
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=36, lastline=50]{ConfigCode.c}
+
+Wykorzystana tutaj metoda strcasecmp pochodzi z bibliteki standardowej strings.h.  Opisuje strategię sprawdzenia, czy dwie tablice znakowe reprezentują te same słowa, niezależnie od wielkości liter w nich zawartych. Uzyskana wartość funkcji w przypadku wykazanej równości ciągów znakowych wynosi 0. 
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=51, lastline=65]{ConfigCode.c}
+
+Inaczej przedstawia się sytuacja w przypadku metod estymujących wartości liczbowe. Do zamiany argumentu o typie znakowym na odpowiednik liczbowy przysłużyła się operacja atoi zaimplementowana w bibliotece cstdlib. Błąd parsowania zostanie zwrócony w chwili:
+\vspace{-3mm} \begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item uzyskania liczby mniejszej od zera, 
+\item oszacowania wartości o wysokości wybiegającej poza granice typu.
+\end{itemize}
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=66, lastline=82]{ConfigCode.c}
+
+Ostatnia metoda parsująca argumenty dyrektyw do zmiennych języka C jest nieco bardziej skomplikowana. Metoda mSplit, przygotowana przez projektantów aplikacji Barnyard2, wykorzystana jest do rozdzielenia identyfikatorów zdarzeń z jednego ciągu znaków do poszczególnych elementów tablicy. W zmiennych konfiguracyjnych zostaje zapamiętana także informacja o rozmiarze tej tablicy.
+
+Poniższa funkcja dokonuje również inicjalizacji zmiennej globalnej reprezentującej dane o zdarzeniach. Zmienna ta jest tablicą przechowująca elementy typu strukturalnego FirewallLockEvent. Do wskazanej struktury dostarczane są infomacje o wartościach GID i SID zdarzenia. Występuje tam także licznik wystąpień danej anomalii w systemie.
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=84, lastline=106]{ConfigCode.c}
+
+Po przebudowaniu i ponownej instalacji oprogramowania otrzymujemy działające środowisko z dodatkowym zestawem parametrów. Dzięki nim można określić jaki zestaw funkcjonalności chciałby uzyskać użytkownik końcowy. Dalsze rozważania poświęcone są zagadnieniu budowania tych funkcjonalności.
+
+\section{Mechanizm blokowania ataków}
+
+Architektura aplikacji Barnyard2 jest złożona. Prócz mechanizmów statycznych posiada moduły dynamiczne zwane pluginami. W tym przypadku specyfikują one operacje wejcia-wyjścia, takie jak zapis informacji do bazy danych, wyświetlanie ostrzeżeń na ekranie, czy zczytywanie danych z plików logów Snort'a. Pluginy wykonują operacje w tle, często w reakcji na pojawienie się jakiegoś zdarzenia. Posiadają stały, swoisty interfejs pozwalający na ich prostą rejestrację w systemie. 
+
+Do realizacji głównego założenia pracy zostały stworzone dwa pluginy operacji wyjścia, a mianowicie spo\_lock\_firewalld oraz spo\_lock\_iptables. Proces rejestracji przebiega w obu przypadkach analogicznie. 
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=1, lastline=4]{PluginCode.c}
+
+Niezbędne jest ustalenie w jaki sposób informacja o działaniu opisywanych procesów ma być prezentowana użytkownikowi. Do konfiguracji dodajemy dwie linie ustawień. 
+\vspace{3mm}
+\begin{lstlisting}[language=bash, frame=single]
+output firewalld_lock_plugin: stdout
+output iptables_lock_plugin: stdout
+\end{lstlisting}
+
+Do listy funkcji wywoływanych przez preprocesor dodajemy nowy proces. Warunkiem spełnienia tej akcji jest zgodność typu firewall'a oraz ulokowanie w konfiguracji choć jednego rodzaju zdarzenia, które uznajemy za szkodliwe.
+ 
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=6, lastline=17]{PluginCode.c}
+
+Należy wspomnieć o tym, że w jednej chwili działać może implementacja tylko jednego ze zdefiniowanych plugin'ów. Każdy z nich realizuje mechanizm oparty o inny firewall. Co oznacza, że podczas rejestracji nowej funkcji preprocesora należy włączyć niezbędne usługi i wyłączyć niewykorzystywane. Wywołanie komendy systemowej realizuje procedura system.  
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=19, lastline=29]{PluginCode.c}
+
+Proces wywoływany w tle opisuje funkcja handleFirewallLock. Jak widać na załączonym skrawku kodu przygotowywane są w niej dane dotyczące przechwyconego zdarzenia, a następnie wywoływana jest odpowiednia komenda systemowa. [Tutaj dopisać jak te dane są przygotowywane, może kawałek kodu.]
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=31, lastline=36]{PluginCode.c}
+
+Aby możliwe było wywołanie komendy usługi firewalld lub iptables dane zdarzenia muszą spełniać pewne warunki : 
+\vspace{-3mm} \begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item typ anomalii musi być zgodny z listą zdarzeń zdefiniowanych w konfiguracji oprogramowania Barnyard2,
+\item zadeklarowany powinien być typ blokady "immediate"
+\item w przypadku typu blokady "occurances\_dependent" ilość wystąpień danego zdarzenia powinna pokrywać się z ustalonym limitem.
+\end{itemize}
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=38, lastline=58]{PluginCode.c}
+
+Ostatnim elementem jest wybranie i uruchomienie odpowiedniej komendy. Wynikiem tego jest zmiana ustawień firewalla, a co za tym idzie zablokowanie możliwości występowania kolejnych zdarzeń o wybranej charakterystyce. Procesy wywoływane przez plugin spo\_lock\_firewalld wykorzystują interfejs firewall-cmd. Poprzez podanie w opcjach strefy "BLOCK" i określenie na jaki port skierowany został atak, można zamknąć środowisku atakującemu drogę do powtórzenia tej operacji. W jaki sposób zostanie to wykonane, zależy od czynników opisanych wcześniej.  
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=60, lastline=74]{PluginCode.c}
+
+W przypadki pluginu spo\_lock\_iptables sytuacja wygląda podobnie. Wykorzystane są jedynie inne mechanizmy, ale realizują podobne założenie. [ Całość jest jeszcze niedokończona. ]
+
+\vspace{3mm}
+\lstinputlisting[frame=single, language=C, firstline=76, lastline=89]{PluginCode.c}
+\clearpage
